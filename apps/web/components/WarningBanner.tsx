@@ -15,9 +15,8 @@ interface WarningBannerProps {
  * Linguaggio sempre descrittivo/retrospettivo, mai allarmistico: sono
  * correzioni automatiche del motore, non errori dell'utente.
  *
- * NB: il titolo del banner è localizzato; i singoli messaggi (`w.message`)
- * sono generati dal motore in italiano (vedi `finance.ts`) — la loro eventuale
- * localizzazione richiede di esporre parametri strutturati dal motore.
+ * I messaggi sono localizzati (IT/EN) a partire da `code` + `params`
+ * strutturati dell'avviso, non dal testo `message` del motore.
  */
 export function WarningBanner({ warnings, compact = false }: WarningBannerProps) {
   const { t } = useI18n();
@@ -36,7 +35,9 @@ export function WarningBanner({ warnings, compact = false }: WarningBannerProps)
       </p>
       <ul className={`${compact ? "mt-1" : "mt-2"} list-inside list-disc space-y-1 text-muted`}>
         {warnings.map((w, i) => (
-          <li key={`${w.code}-${i}`}>{w.message}</li>
+          <li key={`${w.code}-${i}`}>
+            {t.warning.messages[w.code](w.params)}
+          </li>
         ))}
       </ul>
     </div>

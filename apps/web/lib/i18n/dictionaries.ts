@@ -1,4 +1,9 @@
-import type { Instrument, Periodicity } from "@/lib/finance";
+import type {
+  Instrument,
+  Periodicity,
+  SimulationWarningCode,
+  SimulationWarningParams,
+} from "@/lib/finance";
 
 /** Lingue supportate dall'interfaccia. */
 export type Lang = "it" | "en";
@@ -352,6 +357,28 @@ const it = {
   },
   warning: {
     title: "Nota sui dati usati",
+    messages: {
+      invalidDateInput: () =>
+        "Data di inizio o fine non valida: nessun periodo simulato.",
+      invertedDateRange: () =>
+        "La data di fine precede quella di inizio: nessun periodo simulato.",
+      timeWindowCappedForSafety: (p) =>
+        `Finestra temporale troppo ampia: limitata a ${p?.years ?? 100} anni.`,
+      instrumentRangeClamped: () =>
+        "La finestra richiesta eccede i dati storici disponibili per lo strumento scelto: risultato calcolato sul periodo coperto.",
+      inflationRangeClamped: () =>
+        "La serie storica dell'inflazione non copre l'intero periodo richiesto: usato l'ultimo dato disponibile per il resto del periodo.",
+      negativeAmountClamped: (p) =>
+        `${p?.field === "periodicAmount" ? "Importo periodico" : "Capitale iniziale"} non valido o negativo: impostato a 0.`,
+      unknownInstrumentFallback: () =>
+        "Lo strumento selezionato non è più disponibile: usato uno strumento predefinito al suo posto.",
+      unknownPeriodicityFallback: () =>
+        "Cadenza dei versamenti non riconosciuta: usata la cadenza mensile.",
+      taxRateOutOfRangeClamped: () =>
+        "Aliquota di tassazione fuori dall'intervallo 0-100%: corretta al limite più vicino.",
+      valueOverflowClamped: () =>
+        "Alcuni valori intermedi hanno superato i limiti calcolabili e sono stati limitati.",
+    } as Record<SimulationWarningCode, (p?: SimulationWarningParams) => string>,
   },
 };
 
@@ -661,6 +688,27 @@ const en: Dict = {
   },
   warning: {
     title: "Note on the data used",
+    messages: {
+      invalidDateInput: () => "Start or end date invalid: no period simulated.",
+      invertedDateRange: () =>
+        "The end date precedes the start date: no period simulated.",
+      timeWindowCappedForSafety: (p) =>
+        `Time window too wide: capped to ${p?.years ?? 100} years.`,
+      instrumentRangeClamped: () =>
+        "The requested window exceeds the historical data available for the chosen instrument: result computed over the covered period.",
+      inflationRangeClamped: () =>
+        "The historical inflation series does not cover the entire requested period: the last available value was used for the rest of the period.",
+      negativeAmountClamped: (p) =>
+        `${p?.field === "periodicAmount" ? "Recurring amount" : "Initial capital"} invalid or negative: set to 0.`,
+      unknownInstrumentFallback: () =>
+        "The selected instrument is no longer available: a default instrument was used instead.",
+      unknownPeriodicityFallback: () =>
+        "Contribution frequency not recognised: monthly frequency used.",
+      taxRateOutOfRangeClamped: () =>
+        "Taxation rate outside the 0-100% range: corrected to the nearest limit.",
+      valueOverflowClamped: () =>
+        "Some intermediate values exceeded the computable limits and were capped.",
+    },
   },
 };
 
