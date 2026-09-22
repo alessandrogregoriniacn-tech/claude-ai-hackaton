@@ -3,21 +3,27 @@
 Questa cartella raccoglie gli **agenti e i subagent** usati durante lo sviluppo del
 progetto Hagenton: definizioni, prompt, configurazioni e note operative.
 
-## Organizzazione suggerita
+## Organizzazione
 
 ```
 agents/
 ├── README.md                 # questo file
 └── <nome-agente>/
-    ├── agent.md              # ruolo, obiettivo e istruzioni dell'agente
-    └── notes.md              # decisioni, output e apprendimenti
+    └── README.md             # scheda di governance leggibile dell'agente
 ```
 
-Ogni agente dovrebbe documentare:
+La definizione operativa e invocabile (system prompt, tool consentiti, modello) vive
+sempre in `.claude/agents/<nome-agente>.md` — è la fonte di verità per Claude Code.
+`agents/<nome-agente>/README.md` è la scheda di governance leggibile del progetto e
+rimanda a quel file con un link relativo.
 
-- **Ruolo/obiettivo** — cosa deve ottenere;
-- **Ambito** — su quali parti del progetto opera;
-- **Input/Output attesi** — cosa riceve e cosa produce;
-- **Vincoli** — regole da rispettare (stack, design system, no backend, ecc.).
+Ogni scheda dovrebbe documentare:
 
-_(Placeholder: le definizioni degli agenti verranno aggiunte man mano.)_
+- **Ruolo** — cosa deve ottenere e su quali parti del progetto opera (ambito);
+- **Cosa verifica/garantisce** — checklist o vincoli chiave, in forma sintetica
+  (il dettaglio completo resta nel file `.claude/agents/*.md`);
+- **Dove vive** — link al file operativo in `.claude/agents/`;
+- **Come si invoca** — trigger tipici o esempio di richiesta.
+
+Esempi già in repo: `agents/ui-guardian/README.md`, `agents/code-reviewer/README.md`,
+`agents/finance-engine/README.md`.
