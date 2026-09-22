@@ -12,6 +12,10 @@ const WIDTH = 720;
 const HEIGHT = 280;
 const PAD = { top: 16, right: 16, bottom: 44, left: 56 };
 
+/** Larghezza stimata (px nel viewBox) di un carattere delle etichette asse Y. */
+const AXIS_LABEL_CHAR_WIDTH = 6.4;
+const AXIS_LABEL_MAX_LEFT_PAD = 108;
+
 /** Numero minimo di punti visibili: sotto questa soglia lo zoom si ferma. */
 const MIN_WINDOW = 4;
 
@@ -81,12 +85,21 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
     const visible = points.slice(start, end + 1);
     if (visible.length < 2) return null;
 
-    const innerW = WIDTH - PAD.left - PAD.right;
-    const innerH = HEIGHT - PAD.top - PAD.bottom;
     const maxValue = Math.max(...visible.map((p) => p.value), 1);
 
+    // Pad sinistro adattivo: le etichette a 6+ cifre ("€1.234.567") sono più
+    // larghe del pad fisso e verrebbero tagliate dal clip di default dell'SVG.
+    const widestLabelLength = formatCurrency(maxValue).length;
+    const padLeft = Math.min(
+      AXIS_LABEL_MAX_LEFT_PAD,
+      Math.max(PAD.left, 16 + widestLabelLength * AXIS_LABEL_CHAR_WIDTH),
+    );
+
+    const innerW = WIDTH - padLeft - PAD.right;
+    const innerH = HEIGHT - PAD.top - PAD.bottom;
+
     const n = visible.length;
-    const x = (i: number) => PAD.left + (i / (n - 1)) * innerW;
+    const x = (i: number) => padLeft + (i / (n - 1)) * innerW;
     const y = (v: number) => PAD.top + innerH - (v / maxValue) * innerH;
 
     const toPath = (key: "value" | "contributed") =>
@@ -113,7 +126,18 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
       return { x: x(idx), label: formatMonthLabel(visible[idx].month) };
     });
 
-    return { visible, x, y, valuePath, contributedPath, areaPath, gridLines, xTicks, innerH };
+    return {
+      visible,
+      x,
+      y,
+      valuePath,
+      contributedPath,
+      areaPath,
+      gridLines,
+      xTicks,
+      innerH,
+      padLeft,
+    };
   }, [points, start, end, total]);
 
   /** Indice (nella finestra visibile) più vicino alla coordinata X del mouse. */
@@ -123,8 +147,8 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
       if (!svg || !chart) return null;
       const rect = svg.getBoundingClientRect();
       const localX = ((clientX - rect.left) / rect.width) * WIDTH;
-      const innerW = WIDTH - PAD.left - PAD.right;
-      const frac = (localX - PAD.left) / innerW;
+      const innerW = WIDTH - chart.padLeft - PAD.right;
+      const frac = (localX - chart.padLeft) / innerW;
       const i = Math.round(frac * (chart.visible.length - 1));
       return Math.max(0, Math.min(chart.visible.length - 1, i));
     },
@@ -165,9 +189,11 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
     [start, end, clampRange],
   );
 
+  // Solo il pinch-to-zoom (che il browser riporta come wheel + ctrlKey) zooma
+  // il grafico: la rotellina normale deve continuare a scrollare la pagina.
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
-      if (!chart) return;
+      if (!chart || !e.ctrlKey) return;
       e.preventDefault();
       const center = start + (indexFromEvent(e.clientX) ?? 0);
       zoom(e.deltaY > 0 ? 1.2 : 1 / 1.2, center);
@@ -181,7 +207,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
         const svg = svgRef.current;
         if (!svg || !chart) return;
         const rect = svg.getBoundingClientRect();
-        const innerW = WIDTH - PAD.left - PAD.right;
+        const innerW = WIDTH - chart.padLeft - PAD.right;
         const dxPx = e.clientX - dragRef.current.x;
         const dxIdx = Math.round(
           -(dxPx / rect.width) * WIDTH / (innerW / (chart.visible.length - 1)),
@@ -292,7 +318,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
           {chart.gridLines.map((g, i) => (
             <g key={i}>
               <line
-                x1={PAD.left}
+                x1={chart.padLeft}
                 x2={WIDTH - PAD.right}
                 y1={g.y}
                 y2={g.y}
@@ -300,7 +326,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
                 strokeWidth={1}
               />
               <text
-                x={PAD.left - 8}
+                x={chart.padLeft - 8}
                 y={g.y + 4}
                 textAnchor="end"
                 fontSize={AXIS_LABEL_SIZE}
@@ -379,7 +405,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
           versato
         </span>
         <span className="ml-auto hidden sm:inline">
-          Trascina per scorrere · rotellina per zoomare
+          Trascina per scorrere · pinch o Ctrl+rotellina per zoomare
         </span>
       </div>
     </div>
