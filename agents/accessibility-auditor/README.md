@@ -1,6 +1,6 @@
 # Accessibility Auditor
 
-Agente di **audit di accessibilità** dell'app web di Hagenton secondo le **WCAG 2.2**
+Agente di **audit di accessibilità** dell'app web di SeSolo secondo le **WCAG 2.2**
 (baseline livello A + AA).
 
 ## Ruolo

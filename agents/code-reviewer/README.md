@@ -1,7 +1,7 @@
 # Code Reviewer
 
 Agente **revisore della qualità del codice** e **gatekeeper obbligatorio prima di
-ogni push** di Hagenton.
+ogni push** di SeSolo.
 
 ## Ruolo
 

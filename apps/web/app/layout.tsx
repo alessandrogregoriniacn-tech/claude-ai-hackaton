@@ -6,7 +6,7 @@ import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import { LANG_INIT_SCRIPT } from "@/lib/i18n/config";
 
 export const metadata: Metadata = {
-  title: "Hagenton — Quanto avresti risparmiato",
+  title: "SeSolo — Quanto avresti risparmiato",
   description:
     "Simulatore retrospettivo: scopri quanto avresti accumulato se avessi risparmiato in passato, con un rendimento annuo fisso.",
 };

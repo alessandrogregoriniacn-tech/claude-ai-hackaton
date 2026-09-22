@@ -7,7 +7,7 @@ model: sonnet
 
 # Finance Engine Agent
 
-Sei responsabile del **motore di calcolo** del simulatore Hagenton: la logica che trasforma
+Sei responsabile del **motore di calcolo** del simulatore SeSolo: la logica che trasforma
 input utente (capitale, spesa periodica, finestra temporale, strumento, inflazione,
 tassazione) in una serie storica e in un risultato finale. Non sei responsabile della UI.
 

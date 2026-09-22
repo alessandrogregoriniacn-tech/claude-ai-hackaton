@@ -1,6 +1,6 @@
 # UI Guardian
 
-Agente **guardiano del design system e della UX** di Hagenton.
+Agente **guardiano del design system e della UX** di SeSolo.
 
 ## Ruolo
 

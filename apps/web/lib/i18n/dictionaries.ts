@@ -98,10 +98,10 @@ const it = {
     "12m": "ogni 12 mesi",
   } as Record<Periodicity, string>,
   home: {
-    eyebrow: "Hagenton",
+    eyebrow: "SeSolo",
     title: "Quanto avresti risparmiato?",
     intro:
-      "Hagenton è un simulatore retrospettivo: invece di promettere guadagni futuri, guarda al passato. Mostra quanto si sarebbe accumulato oggi se una piccola somma periodica — un abbonamento, un acquisto ricorrente — fosse stata messa da parte e investita in uno strumento a scelta.",
+      "SeSolo è un simulatore retrospettivo: invece di promettere guadagni futuri, guarda al passato. Mostra quanto si sarebbe accumulato oggi se una piccola somma periodica — un abbonamento, un acquisto ricorrente — fosse stata messa da parte e investita in uno strumento a scelta.",
     heroCta: "Prova una simulazione",
     sectionsTitle: "Le sezioni dell'app",
     sectionsSubtitle:
@@ -255,10 +255,10 @@ const it = {
   faq: {
     title: "Domande frequenti",
     subtitle:
-      "Come funziona Hagenton, da dove viene il rendimento e cosa succede ai tuoi dati.",
+      "Come funziona SeSolo, da dove viene il rendimento e cosa succede ai tuoi dati.",
     items: [
       {
-        q: "Che cos'è Hagenton?",
+        q: "Che cos'è SeSolo?",
         a: "È un simulatore retrospettivo di risparmio. Prende un capitale iniziale e una spesa ricorrente e ti mostra quanto avresti accumulato oggi se, invece di spenderli, li avessi investiti nello strumento scelto.",
       },
       {
@@ -275,7 +275,7 @@ const it = {
       },
       {
         q: "I miei dati sono al sicuro?",
-        a: "Sì: Hagenton non fa alcuna chiamata di rete. Gli scenari che salvi restano esclusivamente nella memoria locale del tuo browser (localStorage) e non lasciano mai il tuo dispositivo.",
+        a: "Sì: SeSolo non fa alcuna chiamata di rete. Gli scenari che salvi restano esclusivamente nella memoria locale del tuo browser (localStorage) e non lasciano mai il tuo dispositivo.",
       },
       {
         q: "Dove ritrovo gli scenari salvati?",
@@ -314,7 +314,7 @@ const it = {
   excel: {
     fileName: "hagenton-storico",
     sheetName: "Simulazioni",
-    title: "Hagenton — Storico simulazioni",
+    title: "SeSolo — Storico simulazioni",
     generatedAt: (date: string) => `Esportato il ${date}`,
     columns: {
       name: "Nome scenario",
@@ -432,10 +432,10 @@ const en: Dict = {
     "12m": "every 12 months",
   },
   home: {
-    eyebrow: "Hagenton",
+    eyebrow: "SeSolo",
     title: "How much would you have saved?",
     intro:
-      "Hagenton is a retrospective simulator: instead of promising future gains, it looks to the past. It shows how much you would have today if a small recurring amount — a subscription, a repeat purchase — had been set aside and invested in an instrument of your choice.",
+      "SeSolo is a retrospective simulator: instead of promising future gains, it looks to the past. It shows how much you would have today if a small recurring amount — a subscription, a repeat purchase — had been set aside and invested in an instrument of your choice.",
     heroCta: "Try a simulation",
     sectionsTitle: "The app sections",
     sectionsSubtitle:
@@ -588,10 +588,10 @@ const en: Dict = {
   faq: {
     title: "Frequently asked questions",
     subtitle:
-      "How Hagenton works, where the return comes from and what happens to your data.",
+      "How SeSolo works, where the return comes from and what happens to your data.",
     items: [
       {
-        q: "What is Hagenton?",
+        q: "What is SeSolo?",
         a: "It's a retrospective savings simulator. It takes an initial capital and a recurring expense and shows how much you would have today if, instead of spending them, you had invested them in the chosen instrument.",
       },
       {
@@ -608,7 +608,7 @@ const en: Dict = {
       },
       {
         q: "Is my data safe?",
-        a: "Yes: Hagenton makes no network calls. The scenarios you save stay exclusively in your browser's local storage (localStorage) and never leave your device.",
+        a: "Yes: SeSolo makes no network calls. The scenarios you save stay exclusively in your browser's local storage (localStorage) and never leave your device.",
       },
       {
         q: "Where do I find the saved scenarios?",
@@ -646,7 +646,7 @@ const en: Dict = {
   excel: {
     fileName: "hagenton-history",
     sheetName: "Simulations",
-    title: "Hagenton — Simulation history",
+    title: "SeSolo — Simulation history",
     generatedAt: (date: string) => `Exported on ${date}`,
     columns: {
       name: "Scenario name",

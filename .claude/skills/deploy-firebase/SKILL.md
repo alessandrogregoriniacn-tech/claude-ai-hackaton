@@ -1,14 +1,14 @@
 ---
 name: deploy-firebase
 description: >-
-  Esegue il deploy dell'app web di Hagenton su Firebase Hosting (progetto
+  Esegue il deploy dell'app web di SeSolo su Firebase Hosting (progetto
   hagenton-812d8). Builda l'export statico di Next.js e lo pubblica. Da usare
   quando l'utente vuole rilasciare/pubblicare online il sito. Esempi di trigger:
   "deploya su firebase", "pubblica il sito", "manda in produzione", "rilascia su
   hosting", "fai il deploy".
 ---
 
-# Deploy su Firebase Hosting — Hagenton
+# Deploy su Firebase Hosting — SeSolo
 
 Pubblica l'app web (`apps/web`) su **Firebase Hosting**, progetto
 **`hagenton-812d8`**. L'app è un export statico di Next.js (100% client-side):
