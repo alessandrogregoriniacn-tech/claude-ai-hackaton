@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -70,7 +70,9 @@ function SimulazioneContent() {
 
   const maxDate = useMemo(() => yesterdayISO(), []);
 
-  // Tutti i campi partono vuoti: nessun valore precompilato all'atterraggio.
+  // Tutti i campi partono vuoti: nessun valore precompilato all'atterraggio,
+  // eccetto la tassazione, prevalorizzata con l'aliquota standard italiana
+  // sulle plusvalenze finanziarie (26%) come punto di partenza modificabile.
   const [label, setLabel] = useState("");
   const [initialCapital, setInitialCapital] = useState("");
   const [periodicAmount, setPeriodicAmount] = useState("");
@@ -79,11 +81,14 @@ function SimulazioneContent() {
   const [endDate, setEndDate] = useState("");
   const [instrument, setInstrument] = useState<Instrument | "">("");
   const [adjustForInflation, setAdjustForInflation] = useState(false);
-  const [taxRate, setTaxRate] = useState("");
+  const [taxRate, setTaxRate] = useState("26");
 
   // La simulazione mostrata è quella "commessa" con la CTA Calcola, non live.
   const [committed, setCommitted] = useState<Committed | null>(null);
   const [savedName, setSavedName] = useState<string | null>(null);
+  // Ancora per portare i risultati in vista dopo "Calcola simulazione", senza
+  // interferire con l'annuncio dello screen reader sul warning banner (role="status").
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   // Precarica uno scenario dallo storico quando si arriva con ?load=<id>.
   // Sync intenzionale da storage/URL dopo il mount: i campi non esistono lato
@@ -159,6 +164,19 @@ function SimulazioneContent() {
         "",
       adjustForInflation: input.adjustForInflation,
       years: (computed.months / 12).toFixed(1),
+    });
+
+    // Porta i risultati in vista senza che l'utente debba scrollare a mano;
+    // istantaneo se l'utente preferisce meno movimento (stesso pattern usato
+    // per le transizioni in globals.css).
+    requestAnimationFrame(() => {
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      resultsRef.current?.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "start",
+      });
     });
   }
 
@@ -288,13 +306,7 @@ function SimulazioneContent() {
             <div className="block text-sm text-muted">
               <div className="flex items-center gap-2">
                 <label htmlFor="instrument-select">Strumento</label>
-                <InstrumentInfoPopover
-                  instrument={instrument}
-                  instrumentLabel={
-                    INSTRUMENT_OPTIONS.find((o) => o.value === instrument)
-                      ?.label ?? ""
-                  }
-                />
+                <InstrumentInfoPopover instrument={instrument} />
               </div>
               <select
                 id="instrument-select"
@@ -382,35 +394,37 @@ function SimulazioneContent() {
           )}
         </section>
 
-        {result && result.warnings.length > 0 ? (
-          <WarningBanner warnings={result.warnings} />
-        ) : null}
+        <div ref={resultsRef} className="space-y-6 scroll-mt-6">
+          {result && result.warnings.length > 0 ? (
+            <WarningBanner warnings={result.warnings} />
+          ) : null}
 
-        {/* 3. I tre box del risultato */}
-        <div className="grid gap-4 sm:grid-cols-3">
-          <StatCard
-            label="Avresti oggi"
-            value={result ? formatCurrency(result.finalValue) : DASH}
-            tone="gold"
-          />
-          <StatCard
-            label="Totale investito"
-            value={result ? formatCurrency(result.totalInvested) : DASH}
-          />
-          <StatCard
-            label="Guadagno netto"
-            value={result ? formatCurrency(result.netGain) : DASH}
-            tone="gold"
-            hint={
-              result && result.taxPaid > 0
-                ? `dopo ${formatCurrency(result.taxPaid)} di tasse`
-                : undefined
-            }
-          />
+          {/* 3. I tre box del risultato */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <StatCard
+              label="Avresti oggi"
+              value={result ? formatCurrency(result.finalValue) : DASH}
+              tone="gold"
+            />
+            <StatCard
+              label="Totale investito"
+              value={result ? formatCurrency(result.totalInvested) : DASH}
+            />
+            <StatCard
+              label="Guadagno netto"
+              value={result ? formatCurrency(result.netGain) : DASH}
+              tone="gold"
+              hint={
+                result && result.taxPaid > 0
+                  ? `dopo ${formatCurrency(result.taxPaid)} di tasse`
+                  : undefined
+              }
+            />
+          </div>
+
+          {/* 4. Grafico */}
+          <GrowthChart points={result ? result.points : []} />
         </div>
-
-        {/* 4. Grafico */}
-        <GrowthChart points={result ? result.points : []} />
       </div>
 
       <footer className="mt-12 border-t border-border pt-6 text-xs text-muted">
