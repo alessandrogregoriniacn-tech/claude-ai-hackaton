@@ -28,6 +28,19 @@ non uscire dall'ambito.
 - Calcolare il valore accumulato nel tempo per uno strumento scelto usando **solo
   dataset statici bundlati nel repo** (nessuna chiamata di rete a runtime — coerente
   con `README.md`: "nessuna chiamata API esterna").
+- Quando le fonti storiche hanno cadenze diverse (trimestrale, annuale, giornaliera,
+  quindicinale — vedi `lib/data/raw/README.md`), normalizzarle a un unico formato
+  canonico (`IndexPoint[]`, `{ date, level }`) e ricavare il fattore di crescita tra
+  due date qualunque con **interpolazione geometrica (log-lineare)** tra i due punti
+  che le racchiudono (`lib/data/dateMath.ts`: `levelAt`/`growthFactor`) — equivale ad
+  assumere un tasso costante nell'intervallo tra due osservazioni consecutive, non
+  un valore mancante = 0 né un'estrapolazione oltre il range disponibile.
+- Convertire un CSV grezzo in dataset bundlato solo tramite uno script di
+  generazione one-off (`lib/data/scripts/generate-series.mjs` o analogo) che valida
+  i dati (range di sanità, date strettamente crescenti, nessun `NaN`) **prima** di
+  scrivere l'array letterale: un CSV corrotto deve far fallire la generazione, mai
+  produrre un dataset bundlato silenziosamente sbagliato. Lo script non è mai
+  importato a runtime dall'app.
 - Applicare aggiustamento per inflazione come funzione pura e opzionale (flag esplicito),
   mai attiva implicitamente.
 - Applicare tassazione come aliquota fissa e semplificata **solo sul guadagno**, mai sul
@@ -99,6 +112,13 @@ Per ogni funzione esportata, prima di considerarla finita verifica e copri con u
       sicurezza, non delega la protezione alla sola validazione UI
 - [ ] Scenario caricato che referenzia una chiave strumento non più presente nel
       dataset corrente
+- [ ] Cadenza (`periodicity`) sconosciuta o non più valida (stesso rischio di
+      disallineamento delle chiavi strumento: fallback esplicito a una cadenza di
+      default, mai un `undefined` propagato nel calcolo del contributo mensile)
+- [ ] Finestra temporale "assurda" oltre un tetto di sicurezza fisso (es. secoli,
+      anni a 4+ cifre fuori scala): il motore deve troncare e segnalarlo, non solo
+      clampare al range del dataset — protegge anche da un loop mensile enorme,
+      non solo da un rendimento sbagliato
 
 ## Fuzz test (obbligatorio, oltre alla checklist manuale)
 
@@ -114,5 +134,8 @@ elencare a mano.
 2. `npx tsc --noEmit` senza errori.
 3. Test unitari verdi per ogni caso della checklist sopra, sulla funzione toccata.
 4. Nessun nuovo import di rete (`fetch`, SDK esterni) in `lib/finance.ts` o `lib/data/**`.
+   Se un CSV grezzo in `lib/data/raw/` cambia, i dataset in `lib/data/series/*` vanno
+   rigenerati (`node apps/web/lib/data/scripts/generate-series.mjs`) e ricommittati:
+   non sono derivati a runtime.
 5. Nessuna stringa nel codice o nei messaggi d'errore che assomigli a un consiglio di
    investimento ("dovresti", "conviene comprare/vendere", "ti consigliamo").
