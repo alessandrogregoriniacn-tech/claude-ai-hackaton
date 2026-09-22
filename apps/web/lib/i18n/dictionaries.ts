@@ -149,6 +149,7 @@ const it = {
       initialCapital: "Capitale iniziale (€)",
       periodicAmount: "Spesa periodica (€)",
       periodicity: "Periodicità",
+      periodicityHint: "(solo con spesa periodica)",
       startDate: "Periodo — dal",
       endDate: "Periodo — al",
       instrument: "Strumento",
@@ -157,6 +158,11 @@ const it = {
         "Aliquota standard in Italia: 26% (12,5% per titoli di Stato come BOT/BTP). Puoi comunque inserire un valore diverso.",
       inflation: "Tieni conto dell'inflazione",
       selectPlaceholder: "Seleziona…",
+    },
+    dateRangeErrors: {
+      invalid: "Data non valida: verifica che giorno, mese e anno siano completi.",
+      endBeforeStart: "La data «al» deve essere successiva alla data «dal».",
+      endAfterMax: "La data «al» non può superare ieri.",
     },
     buttons: {
       calculate: "Calcola simulazione",
@@ -309,7 +315,7 @@ const it = {
     fullscreenDialogAria: "Grafico della crescita a schermo intero",
     withReturn: "Con rendimento",
     onlyContributed: "Solo versato",
-    dragHint: "Trascina per scorrere · rotellina per zoomare",
+    dragHint: "Trascina per scorrere · pinch o Ctrl+rotellina per zoomare",
   },
   excel: {
     fileName: "hagenton-storico",
@@ -483,6 +489,7 @@ const en: Dict = {
       initialCapital: "Initial capital (€)",
       periodicAmount: "Recurring expense (€)",
       periodicity: "Frequency",
+      periodicityHint: "(only with a recurring expense)",
       startDate: "Period — from",
       endDate: "Period — to",
       instrument: "Instrument",
@@ -491,6 +498,11 @@ const en: Dict = {
         "Standard rate in Italy: 26% (12.5% for government securities such as BOT/BTP). You can still enter a different value.",
       inflation: "Account for inflation",
       selectPlaceholder: "Select…",
+    },
+    dateRangeErrors: {
+      invalid: "Invalid date: check that day, month and year are complete.",
+      endBeforeStart: "The «to» date must be later than the «from» date.",
+      endAfterMax: "The «to» date can't be later than yesterday.",
     },
     buttons: {
       calculate: "Run simulation",
@@ -641,7 +653,7 @@ const en: Dict = {
     fullscreenDialogAria: "Fullscreen growth chart",
     withReturn: "With return",
     onlyContributed: "Contributed only",
-    dragHint: "Drag to scroll · scroll wheel to zoom",
+    dragHint: "Drag to scroll · pinch or Ctrl+scroll to zoom",
   },
   excel: {
     fileName: "hagenton-history",
