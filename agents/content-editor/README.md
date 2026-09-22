@@ -1,7 +1,7 @@
 # Content Editor
 
 Agente di **revisione e riadattamento dei contenuti testuali** rivolti all'utente di
-Hagenton (copy in italiano: label, messaggi, testi educativi, FAQ, disclaimer, microcopy).
+SeSolo (copy in italiano: label, messaggi, testi educativi, FAQ, disclaimer, microcopy).
 
 ## Ruolo
 

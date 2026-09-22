@@ -1,6 +1,6 @@
 # Finance Engine
 
-Agente **motore di calcolo** del simulatore retrospettivo di Hagenton.
+Agente **motore di calcolo** del simulatore retrospettivo di SeSolo.
 
 ## Ruolo
 
