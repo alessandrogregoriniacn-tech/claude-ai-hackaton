@@ -1,18 +1,28 @@
-import { ANNUAL_RETURN_RATE } from "./constants";
+import { INFLATION_RATE, INSTRUMENT_RETURNS } from "./constants";
 
-export type Frequency = "monthly" | "weekly" | "daily";
+/** Cadenza della spesa periodica. */
+export type Periodicity = "1w" | "2w" | "1m" | "3m" | "6m" | "12m";
+
+/** Strumento su cui si ipotizza l'investimento. */
+export type Instrument = "azionaria" | "obbligazionaria" | "bitcoin";
 
 export interface SimulationInput {
-  /** Importo del singolo versamento/spesa ricorrente. */
-  amount: number;
+  /** Capitale versato all'inizio, una tantum. */
+  initialCapital: number;
+  /** Importo della singola spesa/versamento ricorrente. */
+  periodicAmount: number;
   /** Ogni quanto avviene il versamento. */
-  frequency: Frequency;
-  /** Data di inizio (nel passato), formato ISO YYYY-MM-DD. */
+  periodicity: Periodicity;
+  /** Data di inizio, formato ISO YYYY-MM-DD. */
   startDate: string;
-  /** Data di fine (default: oggi), formato ISO YYYY-MM-DD. */
-  endDate?: string;
-  /** Rendimento annuo, default ANNUAL_RETURN_RATE. */
-  annualRate?: number;
+  /** Data di fine, formato ISO YYYY-MM-DD. */
+  endDate: string;
+  /** Strumento scelto: determina il rendimento annuo nominale. */
+  instrument: Instrument;
+  /** Se true, i valori sono espressi in termini reali (al netto dell'inflazione). */
+  adjustForInflation: boolean;
+  /** Aliquota di tassazione finale sui guadagni, in percentuale (es. 26). */
+  taxRate: number;
 }
 
 export interface MonthlyPoint {
@@ -20,28 +30,35 @@ export interface MonthlyPoint {
   month: string;
   /** Totale versato fino a questo mese (senza rendimento). */
   contributed: number;
-  /** Valore del capitale con rendimento composto. */
+  /** Valore del capitale con rendimento composto (lordo tasse). */
   value: number;
 }
 
 export interface SimulationResult {
   /** Serie temporale mensile del capitale. */
   points: MonthlyPoint[];
-  /** Totale effettivamente versato. */
-  totalContributed: number;
-  /** Valore finale con rendimento. */
+  /** Totale effettivamente investito (capitale iniziale + versamenti). */
+  totalInvested: number;
+  /** Valore finale lordo, prima delle tasse. */
+  grossFinalValue: number;
+  /** Tasse pagate sui guadagni. */
+  taxPaid: number;
+  /** Valore finale al netto delle tasse. */
   finalValue: number;
-  /** Guadagno generato dal rendimento (finalValue - totalContributed). */
-  interestEarned: number;
+  /** Guadagno netto (finalValue - totalInvested). */
+  netGain: number;
   /** Numero di mesi coperti dalla simulazione. */
   months: number;
 }
 
-/** Quanti versamenti avvengono in un mese, in base alla frequenza. */
-const PAYMENTS_PER_MONTH: Record<Frequency, number> = {
-  monthly: 1,
-  weekly: 52 / 12,
-  daily: 365 / 12,
+/** Quanti versamenti avvengono, in media, in un mese. */
+const PAYMENTS_PER_MONTH: Record<Periodicity, number> = {
+  "1w": 52 / 12,
+  "2w": 26 / 12,
+  "1m": 1,
+  "3m": 1 / 3,
+  "6m": 1 / 6,
+  "12m": 1 / 12,
 };
 
 /** Converte un tasso annuo nel tasso mensile composto equivalente. */
@@ -63,26 +80,41 @@ function formatMonth(date: Date): string {
 }
 
 /**
- * Simula, guardando al passato, quanto si sarebbe accumulato versando
- * `amount` con la cadenza indicata da `startDate` fino a `endDate`,
- * applicando un rendimento composto mensile.
+ * Simula quanto si sarebbe accumulato investendo un capitale iniziale più una
+ * spesa ricorrente nella finestra temporale indicata, applicando il rendimento
+ * dello strumento scelto (con capitalizzazione mensile), opzionalmente al netto
+ * dell'inflazione, e sottraendo la tassazione finale sui guadagni.
  */
-export function simulateRetrospective(input: SimulationInput): SimulationResult {
-  const annualRate = input.annualRate ?? ANNUAL_RETURN_RATE;
+export function simulate(input: SimulationInput): SimulationResult {
   const start = new Date(`${input.startDate}T00:00:00`);
-  const end = input.endDate ? new Date(`${input.endDate}T00:00:00`) : new Date();
-
+  const end = new Date(`${input.endDate}T00:00:00`);
   const months = monthsBetween(start, end);
+
+  const nominalAnnual = INSTRUMENT_RETURNS[input.instrument];
+  // In termini reali il rendimento è "sgonfiato" dall'inflazione.
+  const annualRate = input.adjustForInflation
+    ? (1 + nominalAnnual) / (1 + INFLATION_RATE) - 1
+    : nominalAnnual;
+
   const monthlyRate = monthlyRateFromAnnual(annualRate);
-  const monthlyContribution = input.amount * PAYMENTS_PER_MONTH[input.frequency];
+  const monthlyContribution =
+    input.periodicAmount * PAYMENTS_PER_MONTH[input.periodicity];
 
   const points: MonthlyPoint[] = [];
-  let value = 0;
-  let contributed = 0;
+  let value = input.initialCapital;
+  let contributed = input.initialCapital;
 
   const cursor = new Date(start.getFullYear(), start.getMonth(), 1);
 
-  for (let i = 0; i <= months; i++) {
+  // Punto iniziale (mese 0): solo il capitale iniziale.
+  points.push({
+    month: formatMonth(cursor),
+    contributed: round2(contributed),
+    value: round2(value),
+  });
+  cursor.setMonth(cursor.getMonth() + 1);
+
+  for (let i = 1; i <= months; i++) {
     // Crescita del capitale già accumulato, poi il versamento del mese.
     value = value * (1 + monthlyRate) + monthlyContribution;
     contributed += monthlyContribution;
@@ -96,14 +128,20 @@ export function simulateRetrospective(input: SimulationInput): SimulationResult 
     cursor.setMonth(cursor.getMonth() + 1);
   }
 
-  const finalValue = round2(value);
-  const totalContributed = round2(contributed);
+  const grossFinalValue = round2(value);
+  const totalInvested = round2(contributed);
+  const grossGain = grossFinalValue - totalInvested;
+  const taxRate = Math.max(0, input.taxRate) / 100;
+  const taxPaid = round2(grossGain > 0 ? grossGain * taxRate : 0);
+  const finalValue = round2(grossFinalValue - taxPaid);
 
   return {
     points,
-    totalContributed,
+    totalInvested,
+    grossFinalValue,
+    taxPaid,
     finalValue,
-    interestEarned: round2(finalValue - totalContributed),
+    netGain: round2(finalValue - totalInvested),
     months,
   };
 }

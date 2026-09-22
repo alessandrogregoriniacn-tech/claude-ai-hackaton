@@ -3,9 +3,13 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { ANNUAL_RETURN_RATE } from "@/lib/constants";
-import { simulateRetrospective, type Frequency } from "@/lib/finance";
-import { formatCurrency, formatPercent } from "@/lib/format";
+import {
+  simulate,
+  type Instrument,
+  type Periodicity,
+  type SimulationInput,
+} from "@/lib/finance";
+import { formatCurrency } from "@/lib/format";
 import {
   createId,
   loadScenarios,
@@ -15,187 +19,386 @@ import {
 import { StatCard } from "@/components/StatCard";
 import { GrowthChart } from "@/components/GrowthChart";
 
-const FREQUENCY_LABELS: Record<Frequency, string> = {
-  daily: "al giorno",
-  weekly: "a settimana",
-  monthly: "al mese",
-};
+const PERIODICITY_OPTIONS: { value: Periodicity; label: string }[] = [
+  { value: "1w", label: "1 settimana" },
+  { value: "2w", label: "2 settimane" },
+  { value: "1m", label: "1 mese" },
+  { value: "3m", label: "3 mesi" },
+  { value: "6m", label: "6 mesi" },
+  { value: "12m", label: "12 mesi" },
+];
 
-function defaultStartDate(): string {
+const INSTRUMENT_OPTIONS: { value: Instrument; label: string }[] = [
+  { value: "azionaria", label: "Azionaria" },
+  { value: "obbligazionaria", label: "Obbligazionaria" },
+  { value: "bitcoin", label: "Bitcoin" },
+];
+
+/** Trattino usato quando un valore non è ancora calcolabile. */
+const DASH = "—";
+
+/** Data di ieri in formato ISO: è l'ultima data selezionabile (niente oggi/futuro). */
+function yesterdayISO(): string {
   const d = new Date();
-  d.setFullYear(d.getFullYear() - 10);
+  d.setDate(d.getDate() - 1);
   return d.toISOString().slice(0, 10);
 }
+
+/** Converte una stringa di input numerico in numero, o null se vuota/non valida. */
+function parseNumber(raw: string): number | null {
+  if (raw.trim() === "") return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
+/** Snapshot dei risultati "commessi" dall'ultimo calcolo, con i dati per l'intestazione. */
+interface Committed {
+  result: ReturnType<typeof simulate>;
+  label: string;
+  instrumentLabel: string;
+  adjustForInflation: boolean;
+  years: string;
+}
+
+const inputClass =
+  "mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-foreground focus-visible:border-primary";
 
 function SimulazioneContent() {
   const searchParams = useSearchParams();
   const loadId = searchParams.get("load");
 
-  const [amount, setAmount] = useState(5);
-  const [frequency, setFrequency] = useState<Frequency>("daily");
-  const [startDate, setStartDate] = useState(defaultStartDate);
-  const [label, setLabel] = useState("Caffè quotidiano");
-  const [saved, setSaved] = useState(false);
+  const maxDate = useMemo(() => yesterdayISO(), []);
+
+  // Tutti i campi partono vuoti: nessun valore precompilato all'atterraggio.
+  const [label, setLabel] = useState("");
+  const [initialCapital, setInitialCapital] = useState("");
+  const [periodicAmount, setPeriodicAmount] = useState("");
+  const [periodicity, setPeriodicity] = useState<Periodicity | "">("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [instrument, setInstrument] = useState<Instrument | "">("");
+  const [adjustForInflation, setAdjustForInflation] = useState(false);
+  const [taxRate, setTaxRate] = useState("");
+
+  // La simulazione mostrata è quella "commessa" con la CTA Calcola, non live.
+  const [committed, setCommitted] = useState<Committed | null>(null);
+  const [savedName, setSavedName] = useState<string | null>(null);
 
   // Precarica uno scenario dallo storico quando si arriva con ?load=<id>.
+  // Sync intenzionale da storage/URL dopo il mount: i campi non esistono lato
+  // prerender statico, quindi vanno popolati qui.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!loadId) return;
     const scenario = loadScenarios().find((s) => s.id === loadId);
     if (scenario) {
-      setAmount(scenario.amount);
-      setFrequency(scenario.frequency);
-      setStartDate(scenario.startDate);
       setLabel(scenario.label);
+      setInitialCapital(String(scenario.initialCapital));
+      setPeriodicAmount(String(scenario.periodicAmount));
+      setPeriodicity(scenario.periodicity);
+      setStartDate(scenario.startDate);
+      setEndDate(scenario.endDate);
+      setInstrument(scenario.instrument);
+      setAdjustForInflation(scenario.adjustForInflation);
+      setTaxRate(String(scenario.taxRate));
     }
   }, [loadId]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
-  const result = useMemo(
-    () => simulateRetrospective({ amount, frequency, startDate }),
-    [amount, frequency, startDate],
-  );
+  const capitalNum = parseNumber(initialCapital);
+  const amountNum = parseNumber(periodicAmount);
+  const taxNum = parseNumber(taxRate);
 
-  const years = (result.months / 12).toFixed(1);
+  // Input valido = finestra temporale coerente (fine > inizio, non oltre ieri),
+  // strumento e periodicità scelti, almeno un importo positivo.
+  const input = useMemo<SimulationInput | null>(() => {
+    if (!periodicity || !instrument || !startDate || !endDate) return null;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (end <= start) return null;
+    if (end > new Date(maxDate)) return null;
+
+    const capital = capitalNum ?? 0;
+    const amount = amountNum ?? 0;
+    if (capital <= 0 && amount <= 0) return null;
+
+    return {
+      initialCapital: capital,
+      periodicAmount: amount,
+      periodicity,
+      startDate,
+      endDate,
+      instrument,
+      adjustForInflation,
+      taxRate: taxNum ?? 0,
+    };
+  }, [
+    capitalNum,
+    amountNum,
+    periodicity,
+    startDate,
+    endDate,
+    instrument,
+    adjustForInflation,
+    taxNum,
+    maxDate,
+  ]);
+
+  const canSimulate = input !== null;
+  const result = committed?.result ?? null;
+
+  function handleCalculate() {
+    if (!input) return;
+    const computed = simulate(input);
+    setCommitted({
+      result: computed,
+      label: label.trim() || "Scenario",
+      instrumentLabel:
+        INSTRUMENT_OPTIONS.find((o) => o.value === input.instrument)?.label ??
+        "",
+      adjustForInflation: input.adjustForInflation,
+      years: (computed.months / 12).toFixed(1),
+    });
+  }
 
   function handleSave() {
+    if (!input) return;
+    const name = label.trim() || "Scenario senza nome";
     const next: Scenario[] = [
       {
         id: createId(),
-        label: label.trim() || "Scenario senza nome",
-        amount,
-        frequency,
-        startDate,
+        label: name,
+        ...input,
         createdAt: new Date().toISOString(),
       },
       ...loadScenarios(),
     ];
     saveScenarios(next);
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 2500);
+    setSavedName(name);
+    window.setTimeout(() => setSavedName(null), 5000);
   }
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
-      <header className="mb-8">
+      <header className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight">
           Quanto avresti risparmiato
         </h1>
         <p className="mt-2 max-w-2xl text-muted">
-          Invece di guardare ai guadagni futuri, guarda al passato: scopri quanto
-          avresti oggi se avessi messo da parte questa spesa, con un rendimento
-          annuo fisso del {formatPercent(ANNUAL_RETURN_RATE)}.
+          Imposta un capitale iniziale, una spesa ricorrente e una finestra
+          temporale: scopri quanto avresti oggi investendo nello strumento
+          scelto, con capitalizzazione mensile.
         </p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
-        {/* Form */}
-        <section className="rounded-card border border-border bg-surface p-6">
-          <h2 className="text-lg font-semibold">La tua spesa</h2>
-
-          <label className="mt-4 block text-sm text-muted">
-            Nome scenario
-            <input
-              type="text"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-foreground focus-visible:border-primary"
-            />
-          </label>
-
-          <label className="mt-4 block text-sm text-muted">
-            Importo (€)
-            <input
-              type="number"
-              min={0}
-              step={0.5}
-              value={amount}
-              onChange={(e) => setAmount(Math.max(0, Number(e.target.value)))}
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-foreground focus-visible:border-primary"
-            />
-          </label>
-
-          <label className="mt-4 block text-sm text-muted">
-            Frequenza
-            <select
-              value={frequency}
-              onChange={(e) => setFrequency(e.target.value as Frequency)}
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-foreground focus-visible:border-primary"
-            >
-              <option value="daily">Ogni giorno</option>
-              <option value="weekly">Ogni settimana</option>
-              <option value="monthly">Ogni mese</option>
-            </select>
-          </label>
-
-          <label className="mt-4 block text-sm text-muted">
-            A partire dal
-            <input
-              type="date"
-              value={startDate}
-              max={new Date().toISOString().slice(0, 10)}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-foreground focus-visible:border-primary"
-            />
-          </label>
-
-          <button
-            onClick={handleSave}
-            className="mt-6 w-full rounded-pill bg-primary px-4 py-3 font-semibold text-primary-foreground transition hover:opacity-90 active:opacity-80"
-          >
-            Salva scenario
-          </button>
-
-          <p className="mt-3 min-h-5 text-center text-sm text-muted" role="status">
-            {saved ? (
-              <>
-                Salvato nello{" "}
-                <Link href="/storico" className="underline underline-offset-2">
-                  storico
-                </Link>
-                .
-              </>
-            ) : null}
+      <div className="space-y-6">
+        {/* 1. Riepilogo / invito alla compilazione */}
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-card bg-accent px-5 py-4 text-accent-foreground">
+          <p className="text-sm font-medium">
+            {committed
+              ? `${committed.label} · ${committed.instrumentLabel} · ${committed.years} anni${committed.adjustForInflation ? " · al netto dell'inflazione" : ""}`
+              : "Compila i parametri per vedere la simulazione."}
           </p>
-        </section>
+        </div>
 
-        {/* Risultati */}
-        <section className="space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-md bg-accent px-5 py-4 text-accent-foreground">
-            <p className="text-sm font-medium">
-              {label.trim() || "Scenario"} · {formatCurrency(amount, true)}{" "}
-              {FREQUENCY_LABELS[frequency]} · da{" "}
-              {new Date(`${startDate}T00:00:00`).toLocaleDateString("it-IT")} ({years} anni)
+        {/* 2. Form parametri: si sviluppa in larghezza */}
+        <section className="rounded-card border border-border bg-surface p-6">
+          <h2 className="text-lg font-semibold">I tuoi parametri</h2>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <label className="block text-sm text-muted">
+              Nome scenario
+              <input
+                type="text"
+                value={label}
+                placeholder="Es. Piano azionario"
+                onChange={(e) => setLabel(e.target.value)}
+                className={inputClass}
+              />
+            </label>
+
+            <label className="block text-sm text-muted">
+              Capitale iniziale (€)
+              <input
+                type="number"
+                min={0}
+                step={100}
+                value={initialCapital}
+                placeholder="0"
+                onChange={(e) => setInitialCapital(e.target.value)}
+                className={inputClass}
+              />
+            </label>
+
+            <label className="block text-sm text-muted">
+              Spesa periodica (€)
+              <input
+                type="number"
+                min={0}
+                step={10}
+                value={periodicAmount}
+                placeholder="0"
+                onChange={(e) => setPeriodicAmount(e.target.value)}
+                className={inputClass}
+              />
+            </label>
+
+            <label className="block text-sm text-muted">
+              Periodicità
+              <select
+                value={periodicity}
+                onChange={(e) => setPeriodicity(e.target.value as Periodicity)}
+                className={inputClass}
+              >
+                <option value="" disabled>
+                  Seleziona…
+                </option>
+                {PERIODICITY_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block text-sm text-muted">
+              Periodo — dal
+              <input
+                type="date"
+                value={startDate}
+                max={endDate || maxDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className={inputClass}
+              />
+            </label>
+
+            <label className="block text-sm text-muted">
+              Periodo — al
+              <input
+                type="date"
+                value={endDate}
+                min={startDate || undefined}
+                max={maxDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className={inputClass}
+              />
+            </label>
+
+            <label className="block text-sm text-muted">
+              Strumento
+              <select
+                value={instrument}
+                onChange={(e) => setInstrument(e.target.value as Instrument)}
+                className={inputClass}
+              >
+                <option value="" disabled>
+                  Seleziona…
+                </option>
+                {INSTRUMENT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block text-sm text-muted">
+              Tassazione finale (%)
+              <input
+                type="number"
+                min={0}
+                max={100}
+                step={1}
+                value={taxRate}
+                placeholder="0"
+                onChange={(e) => setTaxRate(e.target.value)}
+                className={inputClass}
+              />
+            </label>
+
+            <label className="flex min-h-[44px] items-center gap-2 self-end text-sm text-foreground sm:col-span-2 lg:col-span-3">
+              <input
+                type="checkbox"
+                checked={adjustForInflation}
+                onChange={(e) => setAdjustForInflation(e.target.checked)}
+                className="h-4 w-4 accent-primary"
+              />
+              Tieni conto dell&apos;inflazione
+            </label>
+          </div>
+
+          {/* CTA separate: calcolo dei risultati e salvataggio scenario. */}
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <button
+              onClick={handleCalculate}
+              disabled={!canSimulate}
+              className="rounded-pill bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:opacity-90 active:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Calcola simulazione
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={!canSimulate}
+              className="rounded-pill border border-border px-6 py-3 font-semibold text-foreground transition hover:border-foreground/40 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Salva scenario
+            </button>
+          </div>
+
+          {savedName ? (
+            <div
+              role="status"
+              className="mt-4 rounded-card border border-border bg-accent px-4 py-3 text-sm text-accent-foreground"
+            >
+              <strong>Salvato!</strong> Lo scenario «{savedName}» è ora nel tuo{" "}
+              <Link
+                href="/storico"
+                className="font-medium underline underline-offset-2"
+              >
+                Storico
+              </Link>
+              : puoi riaprirlo e confrontarlo quando vuoi.
+            </div>
+          ) : (
+            <p className="mt-3 min-h-5 text-sm text-muted">
+              «Calcola simulazione» aggiorna i risultati qui sotto. «Salva
+              scenario» lo conserva nello storico (solo nel tuo browser).
             </p>
-            <span className="rounded-md border border-accent-foreground/30 px-3 py-1 text-xs font-semibold">
-              +{formatPercent(ANNUAL_RETURN_RATE)} annuo
-            </span>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard
-              label="Avresti oggi"
-              value={formatCurrency(result.finalValue)}
-              tone="gold"
-            />
-            <StatCard
-              label="Totale versato"
-              value={formatCurrency(result.totalContributed)}
-            />
-            <StatCard
-              label="Guadagno da rendimento"
-              value={formatCurrency(result.interestEarned)}
-              tone="gold"
-              hint={`al ${formatPercent(ANNUAL_RETURN_RATE)} annuo`}
-            />
-          </div>
-
-          <GrowthChart points={result.points} />
+          )}
         </section>
+
+        {/* 3. I tre box del risultato */}
+        <div className="grid gap-4 sm:grid-cols-3">
+          <StatCard
+            label="Avresti oggi"
+            value={result ? formatCurrency(result.finalValue) : DASH}
+            tone="gold"
+          />
+          <StatCard
+            label="Totale investito"
+            value={result ? formatCurrency(result.totalInvested) : DASH}
+          />
+          <StatCard
+            label="Guadagno netto"
+            value={result ? formatCurrency(result.netGain) : DASH}
+            tone="gold"
+            hint={
+              result && result.taxPaid > 0
+                ? `dopo ${formatCurrency(result.taxPaid)} di tasse`
+                : undefined
+            }
+          />
+        </div>
+
+        {/* 4. Grafico */}
+        <GrowthChart points={result ? result.points : []} />
       </div>
 
       <footer className="mt-12 border-t border-border pt-6 text-xs text-muted">
-        Simulazione a scopo illustrativo. Rendimento annuo fisso ipotetico del{" "}
-        {formatPercent(ANNUAL_RETURN_RATE)}, capitalizzazione mensile. Nessun dato
-        lascia il tuo browser: gli scenari sono salvati in locale.
+        Simulazione a scopo illustrativo. I rendimenti degli strumenti sono
+        ipotesi fisse con capitalizzazione mensile e non costituiscono un
+        consiglio di investimento. Nessun dato lascia il tuo browser: gli scenari
+        sono salvati in locale.
       </footer>
     </main>
   );
