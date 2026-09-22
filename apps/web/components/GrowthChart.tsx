@@ -76,7 +76,7 @@ export function GrowthChart({ points }: GrowthChartProps) {
           </g>
         ))}
 
-        <path d={chart.areaPath} fill="var(--color-primary)" opacity={0.12} />
+        <path d={chart.areaPath} fill="var(--color-accent)" opacity={0.35} />
         <path d={chart.contributedPath} fill="none" stroke="var(--color-muted)" strokeWidth={2} strokeDasharray="4 4" />
         <path d={chart.valuePath} fill="none" stroke="var(--color-primary)" strokeWidth={2.5} />
       </svg>

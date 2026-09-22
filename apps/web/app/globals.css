@@ -3,25 +3,47 @@
 @tailwind utilities;
 
 /*
- * DESIGN TOKENS (placeholder)
- * Questi valori verranno sostituiti dai token del design system interno.
- * I componenti usano esclusivamente queste variabili via Tailwind (bg-background,
- * text-foreground, ecc.), quindi il restyle sarà centralizzato qui.
+ * HAGENTON — DESIGN SYSTEM (v1)
+ * Ispirato alla palette "FastPay": fintech chiaro, crema + bianco + nero + giallo oro.
+ * Direzione: "Nero azione, giallo accento" (Opzione A).
+ *
+ * REGOLE D'USO:
+ *  - Il GIALLO (--color-accent) è solo per RIEMPIMENTI/enfasi (hero, chip), MAI per testo.
+ *  - Le AZIONI primarie sono NERE (--color-primary) con testo bianco.
+ *  - L'ORO (--color-accent-strong) è per testo di enfasi (numeri) ma SOLO grande/bold
+ *    (>=18.66px bold): non ha contrasto AA sufficiente per testo piccolo su crema.
+ *  - Tutti i valori devono provenire da questi token; niente colori hard-coded nei componenti.
  */
 :root {
-  --color-background: #0b0f19;
-  --color-foreground: #f5f7fa;
-  --color-surface: #151b2b;
-  --color-border: #26304a;
-  --color-muted: #8b93a7;
-  --color-primary: #4f7cff;
-  --color-primary-foreground: #ffffff;
-  --color-accent: #17c964;
-  --color-accent-foreground: #04160b;
-  --color-positive: #17c964;
-  --color-negative: #f31260;
+  /* Superfici e testo */
+  --color-background: #f5f1e7; /* crema/sabbia */
+  --color-foreground: #14130f; /* ink / near-black */
+  --color-surface: #ffffff; /* card */
+  --color-border: #e7e0ce; /* bordo caldo */
+  --color-muted: #726d5d; /* testo secondario (AA: 4.58:1 su crema, 5.17:1 su bianco) */
 
-  --radius-card: 16px;
+  /* Azione primaria = nero */
+  --color-primary: #14130f;
+  --color-primary-foreground: #ffffff;
+
+  /* Brand accent = giallo oro (solo fill) */
+  --color-accent: #f5ce3e;
+  --color-accent-foreground: #14130f;
+
+  /* Enfasi oro (solo testo grande/bold) */
+  --color-accent-strong: #9a7400;
+
+  /* Semantica finanziaria */
+  --color-positive: #9a7400; /* guadagno (oro) */
+  --color-negative: #b3261e; /* rosso AA su crema/bianco */
+
+  /* Raggi */
+  --radius-card: 24px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
+
+  /* Tipografia */
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -40,4 +62,10 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Focus visibile e accessibile su tutti gli elementi interattivi */
+:focus-visible {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
 }
