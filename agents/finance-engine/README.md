@@ -18,9 +18,13 @@ Inclusione Finanziaria). Scrive codice, a differenza di `ui-guardian` e
 ## Cosa verifica su ogni funzione pubblica (checklist obbligatoria)
 
 - Input "felice", date invertite o coincidenti, importi a zero/negativi/estremi
-- Finestra temporale oltre il range del dataset dello strumento scelto
+- Finestra temporale oltre il range del dataset dello strumento scelto (clamp +
+  avviso esplicito; granularità diverse tra fonti storiche si riconciliano con
+  interpolazione geometrica su un formato dati canonico, non con estrapolazione)
 - Flag inflazione/tassazione con serie/aliquota incompleta o guadagno negativo
-- Scenario salvato che referenzia una chiave strumento non più nel dataset
+- Scenario salvato che referenzia una chiave strumento (o cadenza) non più nel
+  dataset corrente
+- Finestra temporale oltre un tetto di sicurezza fisso (secoli, date fuori scala)
 - Fuzz test (≥200 combinazioni pseudo-casuali): nessun throw/NaN/Infinity
 
 ## Dove vive

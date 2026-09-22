@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -9,6 +9,7 @@ import {
   type Periodicity,
   type SimulationInput,
 } from "@/lib/finance";
+import { INSTRUMENT_KEYS } from "@/lib/constants";
 import {
   createId,
   loadScenarios,
@@ -18,10 +19,11 @@ import {
 } from "@/lib/storage";
 import { StatCard } from "@/components/StatCard";
 import { GrowthChart } from "@/components/GrowthChart";
+import { WarningBanner } from "@/components/WarningBanner";
+import { InstrumentInfoPopover } from "@/components/InstrumentInfoPopover";
 import { useI18n } from "@/components/I18nProvider";
 
 const PERIODICITY_VALUES: Periodicity[] = ["1w", "2w", "1m", "3m", "6m", "12m"];
-const INSTRUMENT_VALUES: Instrument[] = ["azionaria", "obbligazionaria", "bitcoin"];
 
 /** Trattino usato quando un valore non è ancora calcolabile. */
 const DASH = "—";
@@ -54,7 +56,7 @@ const inputClass =
 
 /** Azione secondaria: bordo ink pieno così non sembra un campo disabilitato. */
 const secondaryButtonClass =
-  "rounded-pill border-2 border-foreground px-6 py-3 font-semibold text-foreground transition duration-200 hover:bg-foreground/10 active:opacity-80 motion-safe:hover:scale-105 motion-safe:active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent motion-safe:disabled:hover:scale-100";
+  "rounded-pill border-2 border-foreground px-6 py-3 font-semibold text-foreground transition hover:bg-foreground/10 active:opacity-80 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent";
 
 function SimulazioneContent() {
   const searchParams = useSearchParams();
@@ -63,7 +65,9 @@ function SimulazioneContent() {
 
   const maxDate = useMemo(() => yesterdayISO(), []);
 
-  // Tutti i campi partono vuoti: nessun valore precompilato all'atterraggio.
+  // Tutti i campi partono vuoti: nessun valore precompilato all'atterraggio,
+  // eccetto la tassazione, prevalorizzata con l'aliquota standard italiana
+  // sulle plusvalenze finanziarie (26%) come punto di partenza modificabile.
   const [label, setLabel] = useState("");
   const [initialCapital, setInitialCapital] = useState("");
   const [periodicAmount, setPeriodicAmount] = useState("");
@@ -72,10 +76,13 @@ function SimulazioneContent() {
   const [endDate, setEndDate] = useState("");
   const [instrument, setInstrument] = useState<Instrument | "">("");
   const [adjustForInflation, setAdjustForInflation] = useState(false);
-  const [taxRate, setTaxRate] = useState("");
+  const [taxRate, setTaxRate] = useState("26");
 
   // La simulazione mostrata è quella "commessa" con la CTA Calcola, non live.
   const [committed, setCommitted] = useState<Committed | null>(null);
+  // Ancora per portare i risultati in vista dopo "Calcola simulazione", senza
+  // interferire con l'annuncio dello screen reader sul warning banner (role="status").
+  const resultsRef = useRef<HTMLDivElement>(null);
   // Id dello scenario correlato (aperto dallo storico o appena salvato): abilita
   // l'aggiornamento in-place invece di creare sempre un nuovo scenario.
   const [loadedId, setLoadedId] = useState<string | null>(null);
@@ -182,6 +189,18 @@ function SimulazioneContent() {
       adjustForInflation: input.adjustForInflation,
       years: (computed.months / 12).toFixed(1),
     });
+
+    // Porta i risultati in vista senza che l'utente debba scrollare a mano;
+    // istantaneo se l'utente preferisce meno movimento.
+    requestAnimationFrame(() => {
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      resultsRef.current?.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "start",
+      });
+    });
   }
 
   function flashSaved(name: string, updated: boolean) {
@@ -232,7 +251,7 @@ function SimulazioneContent() {
             {committed
               ? t.sim.summary(
                   committed.label,
-                  t.instruments[committed.instrument],
+                  t.instruments[committed.instrument] ?? "",
                   committed.years,
                   committed.adjustForInflation,
                 )
@@ -323,9 +342,13 @@ function SimulazioneContent() {
               />
             </label>
 
-            <label className="block text-sm text-muted">
-              {t.sim.fields.instrument}
+            <div className="block text-sm text-muted">
+              <div className="flex items-center gap-2">
+                <label htmlFor="instrument-select">{t.sim.fields.instrument}</label>
+                <InstrumentInfoPopover instrument={instrument} />
+              </div>
               <select
+                id="instrument-select"
                 value={instrument}
                 onChange={(e) => setInstrument(e.target.value as Instrument)}
                 className={inputClass}
@@ -333,13 +356,13 @@ function SimulazioneContent() {
                 <option value="" disabled>
                   {t.sim.fields.selectPlaceholder}
                 </option>
-                {INSTRUMENT_VALUES.map((v) => (
+                {INSTRUMENT_KEYS.map((v) => (
                   <option key={v} value={v}>
                     {t.instruments[v]}
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
 
             <label className="block text-sm text-muted">
               {t.sim.fields.taxRate}
@@ -353,6 +376,9 @@ function SimulazioneContent() {
                 onChange={(e) => setTaxRate(e.target.value)}
                 className={inputClass}
               />
+              <span className="mt-1 block text-xs text-muted">
+                {t.sim.fields.taxHint}
+              </span>
             </label>
 
             <label className="flex min-h-[44px] items-center gap-2 self-end text-sm text-foreground sm:col-span-2 lg:col-span-3">
@@ -373,7 +399,7 @@ function SimulazioneContent() {
             <button
               onClick={handleCalculate}
               disabled={!canSimulate}
-              className="rounded-pill bg-primary px-6 py-3 font-semibold text-primary-foreground transition duration-200 hover:opacity-90 active:opacity-80 motion-safe:hover:scale-105 motion-safe:active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 motion-safe:disabled:hover:scale-100"
+              className="rounded-pill bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:opacity-90 active:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {t.sim.buttons.calculate}
             </button>
@@ -408,7 +434,7 @@ function SimulazioneContent() {
           {saved ? (
             <div
               role="status"
-              className="mt-4 rounded-card border border-border bg-accent px-4 py-3 text-sm text-accent-foreground motion-safe:animate-slide-down"
+              className="mt-4 rounded-card border border-border bg-accent px-4 py-3 text-sm text-accent-foreground"
             >
               <strong>{saved.updated ? t.sim.savedUpdated : t.sim.savedNew}</strong>{" "}
               {saved.updated
@@ -430,34 +456,37 @@ function SimulazioneContent() {
           )}
         </section>
 
-        {/* 3. I tre box del risultato: rianimano a ogni nuovo calcolo (key). */}
-        <div
-          key={result ? result.finalValue : "empty"}
-          className="grid gap-4 motion-safe:animate-fade-in sm:grid-cols-3"
-        >
-          <StatCard
-            label={t.sim.stat.today}
-            value={result ? fmtCurrency(result.finalValue) : DASH}
-            tone="gold"
-          />
-          <StatCard
-            label={t.sim.stat.invested}
-            value={result ? fmtCurrency(result.totalInvested) : DASH}
-          />
-          <StatCard
-            label={t.sim.stat.netGain}
-            value={result ? fmtCurrency(result.netGain) : DASH}
-            tone="gold"
-            hint={
-              result && result.taxPaid > 0
-                ? t.sim.stat.taxHint(fmtCurrency(result.taxPaid))
-                : undefined
-            }
-          />
-        </div>
+        <div ref={resultsRef} className="space-y-6 scroll-mt-6">
+          {result && result.warnings.length > 0 ? (
+            <WarningBanner warnings={result.warnings} />
+          ) : null}
 
-        {/* 4. Grafico */}
-        <GrowthChart points={result ? result.points : []} />
+          {/* 3. I tre box del risultato */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <StatCard
+              label={t.sim.stat.today}
+              value={result ? fmtCurrency(result.finalValue) : DASH}
+              tone="gold"
+            />
+            <StatCard
+              label={t.sim.stat.invested}
+              value={result ? fmtCurrency(result.totalInvested) : DASH}
+            />
+            <StatCard
+              label={t.sim.stat.netGain}
+              value={result ? fmtCurrency(result.netGain) : DASH}
+              tone="gold"
+              hint={
+                result && result.taxPaid > 0
+                  ? t.sim.stat.taxHint(fmtCurrency(result.taxPaid))
+                  : undefined
+              }
+            />
+          </div>
+
+          {/* 4. Grafico */}
+          <GrowthChart points={result ? result.points : []} />
+        </div>
 
         {/* 5. Passaggio al confronto con un altro scenario dello storico.
             Con uno scenario correlato (loadedId) lo preselezioniamo come prima

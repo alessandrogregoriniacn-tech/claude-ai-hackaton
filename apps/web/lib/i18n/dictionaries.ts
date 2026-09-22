@@ -68,9 +68,11 @@ const it = {
     en: "Inglese",
   },
   instruments: {
-    azionaria: "Azionaria",
-    obbligazionaria: "Obbligazionaria",
+    globalEquity: "Azionario globale",
+    govBonds10y: "Titoli di Stato (10 anni)",
+    balanced6040: "Bilanciato 60/40",
     bitcoin: "Bitcoin",
+    postalSavings: "Libretto postale",
   } as Record<Instrument, string>,
   /** Etichetta breve per le opzioni della select ("1 settimana"). */
   periodicityShort: {
@@ -146,6 +148,8 @@ const it = {
       endDate: "Periodo — al",
       instrument: "Strumento",
       taxRate: "Tassazione finale (%)",
+      taxHint:
+        "Aliquota standard in Italia: 26% (12,5% per titoli di Stato come BOT/BTP). Puoi comunque inserire un valore diverso.",
       inflation: "Tieni conto dell'inflazione",
       selectPlaceholder: "Seleziona…",
     },
@@ -177,7 +181,7 @@ const it = {
       "Vuoi vedere come si comporta rispetto a un altro scenario salvato?",
     compareCta: "Confronta simulazioni",
     footer:
-      "Simulazione a scopo illustrativo. I rendimenti degli strumenti sono ipotesi fisse con capitalizzazione mensile e non costituiscono un consiglio di investimento. Nessun dato lascia il tuo browser: gli scenari sono salvati in locale.",
+      "Simulazione a scopo illustrativo, calcolata sull'andamento storico reale dello strumento scelto: non costituisce un consiglio di investimento. Nessun dato lascia il tuo browser: gli scenari sono salvati in locale.",
   },
   storico: {
     title: "Storico simulazioni",
@@ -195,14 +199,10 @@ const it = {
     selectedCount: (n: number) =>
       n === 1 ? "1 scenario selezionato" : `${n} scenari selezionati`,
     deleteSelected: "Elimina selezionati",
+    instrumentUnavailable: "Strumento non più disponibile",
     row: {
-      summary: (
-        instrument: string,
-        amount: string,
-        every: string,
-        from: string,
-        to: string,
-      ) => `${instrument} · ${amount} ${every} · dal ${from} al ${to}`,
+      details: (amount: string, every: string, from: string, to: string) =>
+        `${amount} ${every} · dal ${from} al ${to}`,
       open: "Apri",
       delete: "Elimina",
     },
@@ -251,18 +251,14 @@ const it = {
     title: "Domande frequenti",
     subtitle:
       "Come funziona Hagenton, da dove viene il rendimento e cosa succede ai tuoi dati.",
-    items: (returns: {
-      azionaria: string;
-      obbligazionaria: string;
-      bitcoin: string;
-    }) => [
+    items: [
       {
         q: "Che cos'è Hagenton?",
         a: "È un simulatore retrospettivo di risparmio. Prende un capitale iniziale e una spesa ricorrente e ti mostra quanto avresti accumulato oggi se, invece di spenderli, li avessi investiti nello strumento scelto.",
       },
       {
         q: "Come viene calcolato il risultato?",
-        a: `Il capitale iniziale e ogni versamento crescono mese per mese con capitalizzazione mensile (ogni mese i guadagni si sommano al capitale e producono a loro volta rendimento nei mesi successivi), secondo il tasso annuo ipotetico dello strumento scelto: Azionaria ${returns.azionaria}, Obbligazionaria ${returns.obbligazionaria}, Bitcoin ${returns.bitcoin}. All'importo finale si sottrae l'eventuale tassazione sui guadagni.`,
+        a: "Il capitale iniziale e ogni versamento vengono fatti crescere mese per mese secondo l'andamento storico reale dello strumento scelto (dati di mercato effettivi, non un tasso ipotetico fisso uguale per tutti gli strumenti). Al valore finale si sottrae l'eventuale tassazione sui guadagni.",
       },
       {
         q: "Cosa cambia con inflazione e tassazione?",
@@ -270,7 +266,7 @@ const it = {
       },
       {
         q: "Il rendimento è realistico?",
-        a: "Sono ipotesi illustrative e costanti, utili per rendere tangibile l'effetto del tempo. I mercati reali non offrono rendimenti fissi e garantiti: i risultati non sono una previsione né un consiglio finanziario.",
+        a: "I calcoli usano serie storiche reali (indici azionari, titoli di Stato, Bitcoin, tassi di riferimento) per il periodo che scegli, non un rendimento medio inventato: per questo il risultato cambia a seconda della finestra temporale selezionata, proprio come sarebbe successo davvero. Restano comunque dati passati: i mercati reali non offrono rendimenti garantiti, e i risultati non sono una previsione né un consiglio finanziario.",
       },
       {
         q: "I miei dati sono al sicuro?",
@@ -332,6 +328,31 @@ const it = {
     yes: "Sì",
     no: "No",
   },
+  instrumentInfo: {
+    triggerSelected: (label: string) =>
+      `Cosa rappresenta lo strumento «${label}»`,
+    triggerEmpty: "Cosa rappresentano gli strumenti disponibili",
+    panelTitleEmpty: "Strumenti disponibili",
+    emptyPrompt:
+      "Seleziona uno strumento per vedere una spiegazione di cosa rappresenta il dato storico usato.",
+    disclaimer:
+      "Dati storici a scopo illustrativo: nessun consiglio di investimento, nessuna raccomandazione su cosa scegliere, comprare o vendere.",
+    descriptions: {
+      globalEquity:
+        "Rappresenta l'andamento storico dell'indice azionario globale MSCI World (mercati sviluppati, migliaia di aziende in oltre 20 paesi). Storicamente il rendimento più alto nel lungo periodo, ma anche le oscillazioni più marcate nel breve.",
+      govBonds10y:
+        "Rappresenta il rendimento storico dei titoli di Stato USA a 10 anni. Rendimento e rischio più contenuti rispetto all'azionario, meno soggetto a oscillazioni forti.",
+      balanced6040:
+        "Un mix simulato: 60% indice azionario globale + 40% titoli di Stato a 10 anni. Un compromesso classico tra crescita potenziale e stabilità.",
+      bitcoin:
+        "Prezzo storico di Bitcoin. Lo strumento più volatile tra quelli disponibili: può generare guadagni molto alti ma anche perdite rapide e marcate.",
+      postalSavings:
+        "Il rendimento è stimato usando come riferimento il tasso medio storico dei Buoni Ordinari del Tesoro (BOT, 1981–2026): uno strumento di risparmio a rischio pressoché nullo, ma con un rendimento storicamente molto basso, in alcuni periodi inferiore all'inflazione.",
+    } as Record<Instrument, string>,
+  },
+  warning: {
+    title: "Nota sui dati usati",
+  },
 };
 
 /** Tipo del dizionario: la versione inglese deve combaciare struttura per struttura. */
@@ -361,9 +382,11 @@ const en: Dict = {
     en: "English",
   },
   instruments: {
-    azionaria: "Equity",
-    obbligazionaria: "Bonds",
+    globalEquity: "Global equity",
+    govBonds10y: "Government bonds (10y)",
+    balanced6040: "Balanced 60/40",
     bitcoin: "Bitcoin",
+    postalSavings: "Postal savings",
   },
   periodicityShort: {
     "1w": "1 week",
@@ -437,6 +460,8 @@ const en: Dict = {
       endDate: "Period — to",
       instrument: "Instrument",
       taxRate: "Final taxation (%)",
+      taxHint:
+        "Standard rate in Italy: 26% (12.5% for government securities such as BOT/BTP). You can still enter a different value.",
       inflation: "Account for inflation",
       selectPlaceholder: "Select…",
     },
@@ -467,7 +492,7 @@ const en: Dict = {
     comparePrompt: "Want to see how it behaves against another saved scenario?",
     compareCta: "Compare simulations",
     footer:
-      "Illustrative simulation. Instrument returns are fixed assumptions with monthly compounding and do not constitute investment advice. No data leaves your browser: scenarios are saved locally.",
+      "Illustrative simulation, computed on the real historical performance of the chosen instrument: it does not constitute investment advice. No data leaves your browser: scenarios are saved locally.",
   },
   storico: {
     title: "Simulation history",
@@ -485,14 +510,10 @@ const en: Dict = {
     selectedCount: (n: number) =>
       n === 1 ? "1 scenario selected" : `${n} scenarios selected`,
     deleteSelected: "Delete selected",
+    instrumentUnavailable: "Instrument no longer available",
     row: {
-      summary: (
-        instrument: string,
-        amount: string,
-        every: string,
-        from: string,
-        to: string,
-      ) => `${instrument} · ${amount} ${every} · from ${from} to ${to}`,
+      details: (amount: string, every: string, from: string, to: string) =>
+        `${amount} ${every} · from ${from} to ${to}`,
       open: "Open",
       delete: "Delete",
     },
@@ -541,18 +562,14 @@ const en: Dict = {
     title: "Frequently asked questions",
     subtitle:
       "How Hagenton works, where the return comes from and what happens to your data.",
-    items: (returns: {
-      azionaria: string;
-      obbligazionaria: string;
-      bitcoin: string;
-    }) => [
+    items: [
       {
         q: "What is Hagenton?",
         a: "It's a retrospective savings simulator. It takes an initial capital and a recurring expense and shows how much you would have today if, instead of spending them, you had invested them in the chosen instrument.",
       },
       {
         q: "How is the result calculated?",
-        a: `The initial capital and every contribution grow month by month with monthly compounding (each month the gains add to the capital and in turn produce a return in the following months), according to the hypothetical annual rate of the chosen instrument: Equity ${returns.azionaria}, Bonds ${returns.obbligazionaria}, Bitcoin ${returns.bitcoin}. Any taxation on gains is subtracted from the final amount.`,
+        a: "The initial capital and every contribution grow month by month following the real historical performance of the chosen instrument (actual market data, not a fixed hypothetical rate applied equally to every instrument). Any taxation on gains is subtracted from the final value.",
       },
       {
         q: "What changes with inflation and taxation?",
@@ -560,7 +577,7 @@ const en: Dict = {
       },
       {
         q: "Is the return realistic?",
-        a: "They are illustrative, constant assumptions, useful to make the effect of time tangible. Real markets do not offer fixed, guaranteed returns: the results are neither a forecast nor financial advice.",
+        a: "The calculations use real historical series (equity indices, government bonds, Bitcoin, reference rates) for the period you choose, not a made-up average return: that's why the result changes depending on the selected time window, exactly as it would have really happened. It is still past data: real markets offer no guaranteed returns, and the results are neither a forecast nor financial advice.",
       },
       {
         q: "Is my data safe?",
@@ -620,6 +637,30 @@ const en: Dict = {
     },
     yes: "Yes",
     no: "No",
+  },
+  instrumentInfo: {
+    triggerSelected: (label: string) => `What the “${label}” instrument represents`,
+    triggerEmpty: "What the available instruments represent",
+    panelTitleEmpty: "Available instruments",
+    emptyPrompt:
+      "Select an instrument to see an explanation of what the historical data used represents.",
+    disclaimer:
+      "Historical data for illustrative purposes: no investment advice, no recommendation on what to choose, buy or sell.",
+    descriptions: {
+      globalEquity:
+        "Represents the historical performance of the MSCI World global equity index (developed markets, thousands of companies across more than 20 countries). Historically the highest return over the long run, but also the sharpest swings in the short term.",
+      govBonds10y:
+        "Represents the historical yield of 10-year US government bonds. Lower return and risk than equities, less subject to strong swings.",
+      balanced6040:
+        "A simulated mix: 60% global equity index + 40% 10-year government bonds. A classic compromise between potential growth and stability.",
+      bitcoin:
+        "Bitcoin's historical price. The most volatile instrument available: it can produce very high gains but also rapid, sharp losses.",
+      postalSavings:
+        "The return is estimated using the historical average rate of Italian Treasury bills (BOT, 1981–2026) as a reference: an almost risk-free savings instrument, but with a historically very low return, in some periods below inflation.",
+    },
+  },
+  warning: {
+    title: "Note on the data used",
   },
 };
 

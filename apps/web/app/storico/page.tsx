@@ -5,6 +5,7 @@ import Link from "next/link";
 import { simulate } from "@/lib/finance";
 import { loadScenarios, saveScenarios, type Scenario } from "@/lib/storage";
 import { exportScenariosToExcel } from "@/lib/excelExport";
+import { WarningBanner } from "@/components/WarningBanner";
 import { useI18n } from "@/components/I18nProvider";
 
 /** Numero di scenari per pagina: oltre questa soglia compare il paginatore. */
@@ -185,54 +186,74 @@ export default function StoricoPage() {
                 taxRate: s.taxRate,
               });
               const checked = selectedIds.has(s.id);
+              // La chiave strumento salvata può non esistere più (dataset
+              // aggiornato dopo il salvataggio): in tal caso la label è assente
+              // e lo segnaliamo, senza crash e senza etichetta vuota.
+              const instrumentLabel = t.instruments[s.instrument] as
+                | string
+                | undefined;
               return (
                 <li
                   key={s.id}
-                  className={`flex flex-wrap items-center justify-between gap-3 rounded-card border bg-surface px-4 py-3 transition ${
+                  className={`rounded-card border bg-surface px-4 py-3 transition ${
                     checked ? "border-primary" : "border-border"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <label className="-m-2 inline-flex min-h-11 min-w-11 items-center justify-center p-2">
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleRow(s.id)}
-                        aria-label={t.storico.selectRow(s.label)}
-                        className="h-4 w-4 accent-primary"
-                      />
-                    </label>
-                    <div>
-                      <p className="font-medium">{s.label}</p>
-                      <p className="text-sm text-muted">
-                        {t.storico.row.summary(
-                          t.instruments[s.instrument],
-                          fmtCurrency(s.periodicAmount, true),
-                          t.periodicityEvery[s.periodicity],
-                          fmtDate(s.startDate),
-                          fmtDate(s.endDate),
-                        )}
-                      </p>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <label className="-m-2 inline-flex min-h-11 min-w-11 items-center justify-center p-2">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleRow(s.id)}
+                          aria-label={t.storico.selectRow(s.label)}
+                          className="h-4 w-4 accent-primary"
+                        />
+                      </label>
+                      <div>
+                        <p className="font-medium">{s.label}</p>
+                        <p className="text-sm text-muted">
+                          {instrumentLabel ?? (
+                            <span className="inline-flex items-center gap-1 text-negative">
+                              <span aria-hidden="true">⚠</span>
+                              {t.storico.instrumentUnavailable}
+                            </span>
+                          )}{" "}
+                          ·{" "}
+                          {t.storico.row.details(
+                            fmtCurrency(s.periodicAmount, true),
+                            t.periodicityEvery[s.periodicity],
+                            fmtDate(s.startDate),
+                            fmtDate(s.endDate),
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="font-semibold tabular-nums text-foreground">
+                        {fmtCurrency(r.finalValue)}
+                      </span>
+                      <Link
+                        href={`/simulazione?load=${s.id}`}
+                        className="inline-flex min-h-11 items-center rounded-pill border-2 border-foreground px-4 text-sm font-semibold text-foreground transition hover:bg-foreground/10 active:opacity-80"
+                      >
+                        {t.storico.row.open}
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(s.id)}
+                        className="-m-2 inline-flex min-h-11 items-center p-2 text-sm font-medium text-negative underline-offset-2 hover:underline"
+                      >
+                        {t.storico.row.delete}
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="font-semibold tabular-nums text-foreground">
-                      {fmtCurrency(r.finalValue)}
-                    </span>
-                    <Link
-                      href={`/simulazione?load=${s.id}`}
-                      className="inline-flex min-h-11 items-center rounded-pill border-2 border-foreground px-4 text-sm font-semibold text-foreground transition hover:bg-foreground/10 active:opacity-80"
-                    >
-                      {t.storico.row.open}
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(s.id)}
-                      className="-m-2 inline-flex min-h-11 items-center p-2 text-sm font-medium text-negative underline-offset-2 hover:underline"
-                    >
-                      {t.storico.row.delete}
-                    </button>
-                  </div>
+
+                  {r.warnings.length > 0 ? (
+                    <div className="mt-3">
+                      <WarningBanner warnings={r.warnings} compact />
+                    </div>
+                  ) : null}
                 </li>
               );
             })}

@@ -1,16 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { INSTRUMENT_RETURNS } from "@/lib/constants";
 import { useI18n } from "@/components/I18nProvider";
 
 export default function FaqPage() {
-  const { t, fmtPercent } = useI18n();
-  const faqs = t.faq.items({
-    azionaria: fmtPercent(INSTRUMENT_RETURNS.azionaria),
-    obbligazionaria: fmtPercent(INSTRUMENT_RETURNS.obbligazionaria),
-    bitcoin: fmtPercent(INSTRUMENT_RETURNS.bitcoin),
-  });
+  const { t } = useI18n();
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-10">
@@ -20,7 +14,7 @@ export default function FaqPage() {
       </header>
 
       <div className="space-y-3">
-        {faqs.map((item) => (
+        {t.faq.items.map((item) => (
           <details
             key={item.q}
             className="group rounded-card border border-border bg-surface p-5"
