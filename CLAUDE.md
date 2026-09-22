@@ -84,6 +84,47 @@ presentation/   → materiale per la demo finale
 - Palette, token, accessibilità (contrasto AA, focus, touch target ≥44px): vedi
   `apps/web/DESIGN_SYSTEM.md`, verificato da `ui-guardian` su ogni modifica visiva.
 
+### Design system — regole chiave (dettaglio completo in `DESIGN_SYSTEM.md`)
+
+- **Il giallo (`accent`) è solo fill**, mai testo: contrasto insufficiente su
+  crema/bianco. Testo di enfasi (numeri) usa `accent-strong`, **solo se
+  grande/bold** (≥18.66px bold).
+- **Una sola azione primaria per vista** (`bg-primary` + `text-primary-foreground`,
+  forma pill).
+- **Numeri finanziari sempre `tabular-nums`.**
+- Nessun colore/raggio/spaziatura hard-coded: solo token da `globals.css`/
+  `tailwind.config.ts`.
+
+### Dark mode — come funziona (non romperlo)
+
+- Tema applicato via `data-theme="dark"|"light"` su `<html>`, letto dai token CSS
+  in `:root[data-theme="dark"]` (`globals.css`).
+- Uno **script inline in `<head>`** (`THEME_INIT_SCRIPT` in `lib/theme.ts`) imposta
+  l'attributo **prima dell'idratazione** per evitare il flash del tema sbagliato —
+  deve restare il primo elemento in `<head>` (`layout.tsx`), non spostarlo né
+  renderlo un componente React lato client.
+- Persistenza in `localStorage` (chiave `hagenton:theme:v1`), fallback a
+  `prefers-color-scheme` se non impostato.
+- `ThemeToggle` legge il tema reale solo dopo il mount per non divergere dall'HTML
+  SSR (pattern da riusare per qualsiasi altro stato letto da `localStorage`/`window`).
+
+### Pattern di accessibilità già in uso (da riutilizzare, non reinventare)
+
+- Touch target interattivi: `min-h-11`/`min-w-11` (44px).
+- Voce di navigazione attiva: `aria-current="page"`.
+- Menu/disclosure: `aria-expanded` + `aria-controls` sul trigger.
+- Toggle booleani (es. tema): `role="switch"` + `aria-checked`, mai una checkbox
+  nascosta senza semantica.
+- Icone/elementi decorativi: `aria-hidden="true"`; azioni solo-icona: `aria-label`.
+
+### Convenzione chiavi `localStorage`
+
+Formato `hagenton:<dominio>:v<n>` (es. `hagenton:scenarios:v1`,
+`hagenton:theme:v1`). Il numero di versione va incrementato quando cambia la shape
+dei dati salvati; il codice che legge deve restare tollerante a dati salvati con
+una versione precedente (vedi il vincolo del `finance-engine` su scenari che
+referenziano uno strumento non più esistente).
+
 ## Error Handling
 
 Stato/risultato strutturato, mai eccezioni che risalgono fino alla UI per errori
