@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { INSTRUMENT_KEYS, INSTRUMENT_LABELS, type InstrumentKey } from "@/lib/constants";
+import type { InstrumentKey } from "@/lib/constants";
 
 /**
  * Testi informativi per strumento: spiegano cosa rappresenta il dato storico
@@ -22,22 +22,22 @@ const INSTRUMENT_INFO: Record<InstrumentKey, string> = {
 };
 
 const PANEL_ID = "instrument-info-panel";
-const TRIGGER_LABEL = "Informazioni sugli strumenti disponibili";
 
 interface InstrumentInfoPopoverProps {
-  /** Strumento attualmente selezionato nella select: solo per evidenziarlo nella lista. */
   instrument: InstrumentKey | "";
+  instrumentLabel: string;
 }
 
 /**
- * Disclosure accessibile (popover) che elenca sempre tutti gli strumenti
- * disponibili con una spiegazione in linguaggio semplice, evidenziando quello
- * eventualmente selezionato — non filtra sulla selezione corrente, così è
- * utile anche prima di scegliere. Pattern: bottone icona con
+ * Disclosure accessibile (popover) che spiega cosa rappresenta lo strumento
+ * attualmente selezionato nella select. Pattern: bottone icona con
  * aria-expanded/aria-controls, pannello chiudibile con Escape o click fuori,
  * focus riportato sul trigger alla chiusura.
  */
-export function InstrumentInfoPopover({ instrument }: InstrumentInfoPopoverProps) {
+export function InstrumentInfoPopover({
+  instrument,
+  instrumentLabel,
+}: InstrumentInfoPopoverProps) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -68,6 +68,14 @@ export function InstrumentInfoPopover({ instrument }: InstrumentInfoPopoverProps
     };
   }, [open]);
 
+  const description = instrument
+    ? INSTRUMENT_INFO[instrument]
+    : "Seleziona uno strumento per vedere una spiegazione di cosa rappresenta il dato storico usato.";
+
+  const triggerLabel = instrument
+    ? `Cosa rappresenta lo strumento «${instrumentLabel}»`
+    : "Cosa rappresentano gli strumenti disponibili";
+
   return (
     <span className="relative inline-flex">
       {/* Icona piccola e leggera: l'area di tocco resta 44px (min-h-11/min-w-11)
@@ -79,8 +87,8 @@ export function InstrumentInfoPopover({ instrument }: InstrumentInfoPopoverProps
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={PANEL_ID}
-        aria-label={TRIGGER_LABEL}
-        title={TRIGGER_LABEL}
+        aria-label={triggerLabel}
+        title={triggerLabel}
         className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-pill text-muted transition hover:text-foreground"
       >
         <span aria-hidden="true" className="text-base leading-none">
@@ -93,35 +101,13 @@ export function InstrumentInfoPopover({ instrument }: InstrumentInfoPopoverProps
           id={PANEL_ID}
           ref={panelRef}
           role="group"
-          aria-label={TRIGGER_LABEL}
-          className="absolute left-0 top-full z-10 mt-2 w-80 max-w-[90vw] rounded-card border border-border bg-surface p-4 text-sm shadow-lg"
+          aria-label={triggerLabel}
+          className="absolute left-0 top-full z-10 mt-2 w-72 rounded-card border border-border bg-surface p-4 text-sm shadow-lg"
         >
           <p className="font-semibold text-foreground">
-            Cosa rappresentano gli strumenti
+            {instrument ? instrumentLabel : "Strumenti disponibili"}
           </p>
-          <ul className="mt-3 space-y-3">
-            {INSTRUMENT_KEYS.map((key) => {
-              const selected = key === instrument;
-              return (
-                <li
-                  key={key}
-                  className={
-                    selected ? "border-l-2 border-accent pl-2" : "pl-2"
-                  }
-                >
-                  <p className="font-medium text-foreground">
-                    {INSTRUMENT_LABELS[key]}
-                    {selected ? (
-                      <span className="ml-2 text-xs font-normal text-muted">
-                        (selezionato)
-                      </span>
-                    ) : null}
-                  </p>
-                  <p className="mt-1 text-muted">{INSTRUMENT_INFO[key]}</p>
-                </li>
-              );
-            })}
-          </ul>
+          <p className="mt-2 text-muted">{description}</p>
           <p className="mt-3 border-t border-border pt-2 text-xs text-muted">
             Dati storici a scopo illustrativo: nessun consiglio di investimento,
             nessuna raccomandazione su cosa scegliere, comprare o vendere.

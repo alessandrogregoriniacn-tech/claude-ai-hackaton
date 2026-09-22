@@ -306,7 +306,13 @@ function SimulazioneContent() {
             <div className="block text-sm text-muted">
               <div className="flex items-center gap-2">
                 <label htmlFor="instrument-select">Strumento</label>
-                <InstrumentInfoPopover instrument={instrument} />
+                <InstrumentInfoPopover
+                  instrument={instrument}
+                  instrumentLabel={
+                    INSTRUMENT_OPTIONS.find((o) => o.value === instrument)
+                      ?.label ?? ""
+                  }
+                />
               </div>
               <select
                 id="instrument-select"
@@ -340,6 +346,9 @@ function SimulazioneContent() {
               <span className="mt-1 block text-xs text-muted">
                 In Italia l&apos;aliquota standard sulle plusvalenze
                 finanziarie è il 26%: puoi comunque inserire un valore diverso.
+                I titoli di Stato italiani ed equiparati (es. BOT, BTP)
+                godono di un&apos;aliquota agevolata del 12,5%, anziché il
+                26% ordinario applicato agli altri strumenti finanziari.
               </span>
             </label>
 
