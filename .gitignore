@@ -16,3 +16,6 @@ build/
 
 # Claude Code local settings (personal, machine-specific)
 .claude/settings.local.json
+
+# coverage report
+/apps/web/reports/coverage/

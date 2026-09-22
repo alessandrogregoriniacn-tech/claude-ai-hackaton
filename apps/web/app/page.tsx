@@ -5,7 +5,7 @@ const SECTIONS = [
     href: "/simulazione",
     title: "Simulazione",
     description:
-      "Inserisci un capitale iniziale, una spesa ricorrente e una finestra temporale, scegli lo strumento e scopri quanto avresti oggi se l'avessi investita.",
+      "Inserisci un capitale iniziale, una spesa ricorrente e un periodo: scopri quanto avresti accumulato investendo nello strumento scelto.",
     cta: "Avvia una simulazione",
   },
   {
@@ -34,10 +34,10 @@ export default function HomePage() {
         </h1>
         <p className="mt-4 max-w-2xl text-base">
           Hagenton è un simulatore <strong>retrospettivo</strong>: invece di
-          promettere guadagni futuri, guarda al passato. Ti mostra quanto avresti
-          oggi se una piccola spesa ricorrente — il caffè al bar, un abbonamento,
-          lo snack quotidiano — l&apos;avessi messa da parte e investita nello
-          strumento che preferisci.
+          promettere guadagni futuri, guarda al passato. Mostra quanto si
+          sarebbe accumulato oggi se una piccola somma periodica — un
+          abbonamento, un acquisto ricorrente — fosse stata messa da parte e
+          investita in uno strumento a scelta.
         </p>
         <Link
           href="/simulazione"

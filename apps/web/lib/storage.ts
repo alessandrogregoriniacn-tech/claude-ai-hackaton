@@ -41,3 +41,18 @@ export function saveScenarios(scenarios: Scenario[]): void {
 export function createId(): string {
   return `sc_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
+
+/**
+ * Aggiorna in-place lo scenario con l'id dato, preservando id e createdAt.
+ * Se l'id non esiste (es. scenario cancellato in un'altra scheda) la lista
+ * resta invariata.
+ */
+export function updateScenario(
+  scenarios: Scenario[],
+  id: string,
+  patch: Omit<Scenario, "id" | "createdAt">,
+): Scenario[] {
+  return scenarios.map((s) =>
+    s.id === id ? { ...s, ...patch, id: s.id, createdAt: s.createdAt } : s,
+  );
+}

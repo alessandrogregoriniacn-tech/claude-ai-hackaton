@@ -143,6 +143,9 @@ da Claude Code) e una scheda di governance leggibile in `agents/<nome>/README.md
   qualsiasi modifica visiva (componenti, token, nuove pagine).
 - **`code-reviewer`** — gatekeeper obbligatorio prima di ogni `git push`: type-check,
   lint, build. Se trova errori non pusha e chiede come procedere.
+- **`accessibility-auditor`** — audit di accessibilità WCAG 2.2 (A + AA) di pagine e
+  componenti: produce un report Excel in `reports/accessibility/` e chiede se
+  correggere i problemi (non applica fix senza autorizzazione).
 
 ## Deliverable richiesti dal tema (da tenere a mente durante lo sviluppo)
 
