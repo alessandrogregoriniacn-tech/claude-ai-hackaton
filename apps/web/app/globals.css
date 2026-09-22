@@ -45,6 +45,40 @@
 
   /* Tipografia */
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  color-scheme: light;
+}
+
+/*
+ * TEMA SCURO
+ * Stessa direzione ("nero azione, giallo accento") ribaltata: l'ink diventa lo
+ * sfondo, la crema diventa il testo. L'azione primaria è chiara su fondo scuro,
+ * il giallo resta l'accento (fill). L'oro d'enfasi diventa più brillante per
+ * mantenere il contrasto AA su superfici scure.
+ */
+:root[data-theme="dark"] {
+  --color-background: #14130f; /* ink */
+  --color-foreground: #f3efe4; /* crema chiara */
+  --color-surface: #1f1d17; /* card scura */
+  --color-border: #787060; /* bordo caldo: 3.44:1 su surface, 3.79:1 su bg (WCAG 1.4.11) */
+  --color-muted: #a79f8c; /* testo secondario (AA: 6.40:1 su surface, 7.06:1 su background) */
+
+  /* Azione primaria = chiara su fondo scuro */
+  --color-primary: #f3efe4;
+  --color-primary-foreground: #14130f;
+
+  /* Brand accent = giallo oro (invariato, solo fill) */
+  --color-accent: #f5ce3e;
+  --color-accent-foreground: #14130f;
+
+  /* Enfasi oro (solo testo grande/bold): oro più brillante, distinto dal fill
+     accent per non perdere la semantica del token su scuro. 12.5:1 su surface. */
+  --color-accent-strong: #ffd84d;
+
+  --color-positive: #ffd84d;
+  --color-negative: #f2645b; /* rosso più chiaro, AA su scuro */
+
+  color-scheme: dark;
 }
 
 * {
@@ -62,6 +96,17 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Transizione morbida al cambio tema (rispetta le preferenze di movimento) */
+@media (prefers-reduced-motion: no-preference) {
+  body,
+  .theme-transition {
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
 }
 
 /* Focus visibile e accessibile su tutti gli elementi interattivi */

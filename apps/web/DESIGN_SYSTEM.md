@@ -25,6 +25,29 @@ componenti usano **solo** questi token: nessun colore/raggio/spaziatura hard-cod
 | `--color-positive` | `#9A7400` | guadagno |
 | `--color-negative` | `#B3261E` | valori negativi/errori |
 
+## Tema scuro
+
+Il tema scuro vive in `:root[data-theme="dark"]` (in `globals.css`) e ribalta la
+direzione mantenendo le stesse regole: **l'ink diventa lo sfondo, la crema il
+testo, il giallo resta l'accento (solo fill)**. L'azione primaria si inverte in
+chiara su fondo scuro. Il tema è scelto dal toggle in navigazione (persistito in
+`localStorage`, con fallback alla preferenza di sistema); uno script inline in
+`<head>` lo applica prima dell'idratazione per evitare il flash.
+
+| Token | Light | Dark |
+| --- | --- | --- |
+| `--color-background` | `#F5F1E7` | `#14130F` |
+| `--color-surface` | `#FFFFFF` | `#1F1D17` |
+| `--color-foreground` | `#14130F` | `#F3EFE4` |
+| `--color-muted` | `#726D5D` | `#A79F8C` |
+| `--color-border` | `#E7E0CE` | `#787060` (≥ 3:1 sulle superfici scure, WCAG 1.4.11) |
+| `--color-primary` | `#14130F` | `#F3EFE4` |
+| `--color-accent` | `#F5CE3E` | `#F5CE3E` |
+| `--color-accent-strong` | `#9A7400` | `#FFD84D` (oro più brillante, distinto dal fill) |
+| `--color-negative` | `#B3261E` | `#F2645B` |
+
+Le regole cromatiche qui sotto valgono in **entrambi** i temi.
+
 ## Regole cromatiche (fondamentali)
 
 1. **Il giallo è solo fill, mai testo.** `#F5CE3E` su crema/bianco non raggiunge il
