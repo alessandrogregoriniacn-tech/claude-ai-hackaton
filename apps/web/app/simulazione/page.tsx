@@ -9,8 +9,7 @@ import {
   type Periodicity,
   type SimulationInput,
 } from "@/lib/finance";
-import { INSTRUMENT_KEYS, INSTRUMENT_LABELS } from "@/lib/constants";
-import { formatCurrency } from "@/lib/format";
+import { INSTRUMENT_KEYS } from "@/lib/constants";
 import {
   createId,
   loadScenarios,
@@ -22,19 +21,9 @@ import { StatCard } from "@/components/StatCard";
 import { GrowthChart } from "@/components/GrowthChart";
 import { WarningBanner } from "@/components/WarningBanner";
 import { InstrumentInfoPopover } from "@/components/InstrumentInfoPopover";
+import { useI18n } from "@/components/I18nProvider";
 
-const PERIODICITY_OPTIONS: { value: Periodicity; label: string }[] = [
-  { value: "1w", label: "1 settimana" },
-  { value: "2w", label: "2 settimane" },
-  { value: "1m", label: "1 mese" },
-  { value: "3m", label: "3 mesi" },
-  { value: "6m", label: "6 mesi" },
-  { value: "12m", label: "12 mesi" },
-];
-
-/** Fonte di verità unica per chiavi/etichette: `lib/constants.ts`. */
-const INSTRUMENT_OPTIONS: { value: Instrument; label: string }[] =
-  INSTRUMENT_KEYS.map((key) => ({ value: key, label: INSTRUMENT_LABELS[key] }));
+const PERIODICITY_VALUES: Periodicity[] = ["1w", "2w", "1m", "3m", "6m", "12m"];
 
 /** Trattino usato quando un valore non è ancora calcolabile. */
 const DASH = "—";
@@ -60,7 +49,7 @@ function parseNumber(raw: string): number | null {
 interface Committed {
   result: ReturnType<typeof simulate>;
   label: string;
-  instrumentLabel: string;
+  instrument: Instrument;
   adjustForInflation: boolean;
   years: string;
 }
@@ -75,6 +64,7 @@ const secondaryButtonClass =
 function SimulazioneContent() {
   const searchParams = useSearchParams();
   const loadId = searchParams.get("load");
+  const { t, fmtCurrency } = useI18n();
 
   const maxDate = useMemo(() => yesterdayISO(), []);
 
@@ -138,14 +128,15 @@ function SimulazioneContent() {
       const computed = simulate(scenarioInput);
       setCommitted({
         result: computed,
-        label: scenario.label.trim() || "Scenario",
-        instrumentLabel:
-          INSTRUMENT_OPTIONS.find((o) => o.value === scenario.instrument)
-            ?.label ?? "",
+        label: scenario.label.trim() || t.sim.defaultName,
+        instrument: scenario.instrument,
         adjustForInflation: scenario.adjustForInflation,
         years: (computed.months / 12).toFixed(1),
       });
     }
+    // t.sim.defaultName è stabile per lingua; lo scenario si ricalcola comunque
+    // al cambio di ?load.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadId]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -161,12 +152,12 @@ function SimulazioneContent() {
     const start = new Date(startDate);
     const end = new Date(endDate);
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-      return "Data non valida: verifica che giorno, mese e anno siano completi.";
+      return t.sim.dateRangeErrors.invalid;
     }
-    if (end <= start) return "La data «al» deve essere successiva alla data «dal».";
-    if (end > new Date(maxDate)) return "La data «al» non può superare ieri.";
+    if (end <= start) return t.sim.dateRangeErrors.endBeforeStart;
+    if (end > new Date(maxDate)) return t.sim.dateRangeErrors.endAfterMax;
     return null;
-  }, [startDate, endDate, maxDate]);
+  }, [startDate, endDate, maxDate, t]);
 
   // Input valido = finestra temporale coerente (fine > inizio, non oltre ieri),
   // strumento scelto, almeno un importo positivo. La periodicità serve solo se
@@ -209,17 +200,14 @@ function SimulazioneContent() {
     const computed = simulate(input);
     setCommitted({
       result: computed,
-      label: label.trim() || "Scenario",
-      instrumentLabel:
-        INSTRUMENT_OPTIONS.find((o) => o.value === input.instrument)?.label ??
-        "",
+      label: label.trim() || t.sim.defaultName,
+      instrument: input.instrument,
       adjustForInflation: input.adjustForInflation,
       years: (computed.months / 12).toFixed(1),
     });
 
     // Porta i risultati in vista senza che l'utente debba scrollare a mano;
-    // istantaneo se l'utente preferisce meno movimento (stesso pattern usato
-    // per le transizioni in globals.css).
+    // istantaneo se l'utente preferisce meno movimento.
     requestAnimationFrame(() => {
       const reduceMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)",
@@ -240,7 +228,7 @@ function SimulazioneContent() {
   // così un ulteriore salvataggio può aggiornarlo invece di duplicarlo.
   function handleSaveNew() {
     if (!input) return;
-    const name = label.trim() || "Scenario senza nome";
+    const name = label.trim() || t.sim.defaultNameUnnamed;
     const id = createId();
     const next: Scenario[] = [
       { id, label: name, ...input, createdAt: new Date().toISOString() },
@@ -255,7 +243,7 @@ function SimulazioneContent() {
   // altrove, ripieghiamo su un salvataggio come nuovo per non perdere i dati.
   function handleUpdate() {
     if (!input || !loadedId) return;
-    const name = label.trim() || "Scenario senza nome";
+    const name = label.trim() || t.sim.defaultNameUnnamed;
     const current = loadScenarios();
     if (!current.some((s) => s.id === loadedId)) {
       handleSaveNew();
@@ -268,15 +256,8 @@ function SimulazioneContent() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
       <header className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Quanto avresti risparmiato
-        </h1>
-        <p className="mt-2 max-w-2xl text-muted">
-          Imposta un capitale iniziale, una spesa ricorrente e un periodo:
-          scopri quanto avresti accumulato investendo nello strumento scelto,
-          con capitalizzazione mensile (i guadagni si sommano al capitale ogni
-          mese).
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t.sim.title}</h1>
+        <p className="mt-2 max-w-2xl text-muted">{t.sim.subtitle}</p>
       </header>
 
       <div className="space-y-6">
@@ -284,29 +265,34 @@ function SimulazioneContent() {
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-card bg-accent px-5 py-4 text-accent-foreground">
           <p className="text-sm font-medium">
             {committed
-              ? `${committed.label} · ${committed.instrumentLabel} · ${committed.years} anni${committed.adjustForInflation ? " · al netto dell'inflazione" : ""}`
-              : "Compila i parametri per vedere la simulazione."}
+              ? t.sim.summary(
+                  committed.label,
+                  t.instruments[committed.instrument] ?? "",
+                  committed.years,
+                  committed.adjustForInflation,
+                )
+              : t.sim.summaryEmpty}
           </p>
         </div>
 
         {/* 2. Form parametri: si sviluppa in larghezza */}
         <section className="rounded-card border border-border bg-surface p-6">
-          <h2 className="text-lg font-semibold">Parametri della simulazione</h2>
+          <h2 className="text-lg font-semibold">{t.sim.paramsTitle}</h2>
 
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <label className="block text-sm text-muted">
-              Nome scenario
+              {t.sim.fields.label}
               <input
                 type="text"
                 value={label}
-                placeholder="Es. Piano azionario"
+                placeholder={t.sim.fields.labelPlaceholder}
                 onChange={(e) => setLabel(e.target.value)}
                 className={inputClass}
               />
             </label>
 
             <label className="block text-sm text-muted">
-              Capitale iniziale (€)
+              {t.sim.fields.initialCapital}
               <input
                 type="number"
                 min={0}
@@ -319,7 +305,7 @@ function SimulazioneContent() {
             </label>
 
             <label className="block text-sm text-muted">
-              Spesa periodica (€)
+              {t.sim.fields.periodicAmount}
               <input
                 type="number"
                 min={0}
@@ -332,26 +318,26 @@ function SimulazioneContent() {
             </label>
 
             <label className="block text-sm text-muted">
-              Periodicità
-              <span className="ml-1 text-xs">(solo con spesa periodica)</span>
+              {t.sim.fields.periodicity}
+              <span className="ml-1 text-xs">{t.sim.fields.periodicityHint}</span>
               <select
                 value={periodicity}
                 onChange={(e) => setPeriodicity(e.target.value as Periodicity)}
                 className={inputClass}
               >
                 <option value="" disabled>
-                  Seleziona…
+                  {t.sim.fields.selectPlaceholder}
                 </option>
-                {PERIODICITY_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
+                {PERIODICITY_VALUES.map((v) => (
+                  <option key={v} value={v}>
+                    {t.periodicityShort[v]}
                   </option>
                 ))}
               </select>
             </label>
 
             <label className="block text-sm text-muted">
-              Periodo — dal
+              {t.sim.fields.startDate}
               <input
                 type="date"
                 value={startDate}
@@ -362,7 +348,7 @@ function SimulazioneContent() {
             </label>
 
             <label className="block text-sm text-muted">
-              Periodo — al
+              {t.sim.fields.endDate}
               <input
                 type="date"
                 value={endDate}
@@ -384,14 +370,8 @@ function SimulazioneContent() {
 
             <div className="block text-sm text-muted">
               <div className="flex items-center gap-2">
-                <label htmlFor="instrument-select">Strumento</label>
-                <InstrumentInfoPopover
-                  instrument={instrument}
-                  instrumentLabel={
-                    INSTRUMENT_OPTIONS.find((o) => o.value === instrument)
-                      ?.label ?? ""
-                  }
-                />
+                <label htmlFor="instrument-select">{t.sim.fields.instrument}</label>
+                <InstrumentInfoPopover instrument={instrument} />
               </div>
               <select
                 id="instrument-select"
@@ -400,18 +380,18 @@ function SimulazioneContent() {
                 className={inputClass}
               >
                 <option value="" disabled>
-                  Seleziona…
+                  {t.sim.fields.selectPlaceholder}
                 </option>
-                {INSTRUMENT_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
+                {INSTRUMENT_KEYS.map((v) => (
+                  <option key={v} value={v}>
+                    {t.instruments[v]}
                   </option>
                 ))}
               </select>
             </div>
 
             <label className="block text-sm text-muted">
-              Tassazione finale (%)
+              {t.sim.fields.taxRate}
               <input
                 type="number"
                 min={0}
@@ -423,8 +403,7 @@ function SimulazioneContent() {
                 className={inputClass}
               />
               <span className="mt-1 block text-xs text-muted">
-                Aliquota standard in Italia: 26% (12,5% per titoli di Stato
-                come BOT/BTP). Puoi comunque inserire un valore diverso.
+                {t.sim.fields.taxHint}
               </span>
             </label>
 
@@ -435,7 +414,7 @@ function SimulazioneContent() {
                 onChange={(e) => setAdjustForInflation(e.target.checked)}
                 className="h-4 w-4 accent-primary"
               />
-              Tieni conto dell&apos;inflazione
+              {t.sim.fields.inflation}
             </label>
           </div>
 
@@ -448,7 +427,7 @@ function SimulazioneContent() {
               disabled={!canSimulate}
               className="rounded-pill bg-primary px-6 py-3 font-semibold text-primary-foreground transition hover:opacity-90 active:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Calcola simulazione
+              {t.sim.buttons.calculate}
             </button>
             {loadedId ? (
               <>
@@ -457,14 +436,14 @@ function SimulazioneContent() {
                   disabled={!canSimulate}
                   className={secondaryButtonClass}
                 >
-                  Aggiorna scenario
+                  {t.sim.buttons.update}
                 </button>
                 <button
                   onClick={handleSaveNew}
                   disabled={!canSimulate}
                   className={secondaryButtonClass}
                 >
-                  Salva come nuovo
+                  {t.sim.buttons.saveAsNew}
                 </button>
               </>
             ) : (
@@ -473,7 +452,7 @@ function SimulazioneContent() {
                 disabled={!canSimulate}
                 className={secondaryButtonClass}
               >
-                Salva scenario
+                {t.sim.buttons.save}
               </button>
             )}
           </div>
@@ -483,23 +462,22 @@ function SimulazioneContent() {
               role="status"
               className="mt-4 rounded-card border border-border bg-accent px-4 py-3 text-sm text-accent-foreground"
             >
-              <strong>{saved.updated ? "Aggiornato!" : "Salvato!"}</strong> Lo
-              scenario «{saved.name}» è {saved.updated ? "aggiornato" : "ora"} nel
-              tuo{" "}
+              <strong>{saved.updated ? t.sim.savedUpdated : t.sim.savedNew}</strong>{" "}
+              {saved.updated
+                ? t.sim.savedBodyUpdated(saved.name)
+                : t.sim.savedBodyNew(saved.name)}{" "}
               <Link
                 href="/storico"
                 className="font-medium underline underline-offset-2"
               >
-                Storico
+                {t.sim.savedHistoryLink}
               </Link>
-              : puoi riaprirlo e confrontarlo quando vuoi.
+              {t.sim.savedBodyTail}
             </div>
           ) : (
             <p className="mt-3 min-h-5 text-sm text-muted">
-              «Calcola simulazione» aggiorna i risultati qui sotto.{" "}
-              {loadedId
-                ? "«Aggiorna scenario» sovrascrive quello aperto; «Salva come nuovo» ne crea una copia."
-                : "«Salva scenario» lo conserva nello storico (solo nel tuo browser)."}
+              {t.sim.helperCalc}{" "}
+              {loadedId ? t.sim.helperLoaded : t.sim.helperNew}
             </p>
           )}
         </section>
@@ -512,21 +490,21 @@ function SimulazioneContent() {
           {/* 3. I tre box del risultato */}
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard
-              label="Avresti oggi"
-              value={result ? formatCurrency(result.finalValue) : DASH}
+              label={t.sim.stat.today}
+              value={result ? fmtCurrency(result.finalValue) : DASH}
               tone="gold"
             />
             <StatCard
-              label="Totale investito"
-              value={result ? formatCurrency(result.totalInvested) : DASH}
+              label={t.sim.stat.invested}
+              value={result ? fmtCurrency(result.totalInvested) : DASH}
             />
             <StatCard
-              label="Guadagno netto"
-              value={result ? formatCurrency(result.netGain) : DASH}
+              label={t.sim.stat.netGain}
+              value={result ? fmtCurrency(result.netGain) : DASH}
               tone="gold"
               hint={
                 result && result.taxPaid > 0
-                  ? `dopo ${formatCurrency(result.taxPaid)} di tasse`
+                  ? t.sim.stat.taxHint(fmtCurrency(result.taxPaid))
                   : undefined
               }
             />
@@ -535,13 +513,25 @@ function SimulazioneContent() {
           {/* 4. Grafico */}
           <GrowthChart points={result ? result.points : []} />
         </div>
+
+        {/* 5. Passaggio al confronto con un altro scenario dello storico.
+            Con uno scenario correlato (loadedId) lo preselezioniamo come prima
+            simulazione; altrimenti si atterra sul confronto a selezione libera. */}
+        {committed ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-border bg-surface px-5 py-4">
+            <p className="text-sm text-muted">{t.sim.comparePrompt}</p>
+            <Link
+              href={loadedId ? `/confronta?a=${loadedId}` : "/confronta"}
+              className={secondaryButtonClass}
+            >
+              {t.sim.compareCta}
+            </Link>
+          </div>
+        ) : null}
       </div>
 
       <footer className="mt-12 border-t border-border pt-6 text-xs text-muted">
-        Simulazione a scopo illustrativo, calcolata sull&apos;andamento storico
-        reale dello strumento scelto: non costituisce un consiglio di
-        investimento. Nessun dato lascia il tuo browser: gli scenari sono
-        salvati in locale.
+        {t.sim.footer}
       </footer>
     </main>
   );

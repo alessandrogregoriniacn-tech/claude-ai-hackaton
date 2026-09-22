@@ -114,3 +114,33 @@ body {
   outline: 2px solid var(--color-foreground);
   outline-offset: 2px;
 }
+
+/*
+ * Sottolineatura animata per i link: una barra che cresce da sinistra a destra
+ * all'hover/focus. Usa currentColor per restare coerente con qualunque tema.
+ * L'effetto è puramente decorativo e si disattiva con prefers-reduced-motion.
+ */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 0.35rem;
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .link-underline::after {
+    transition: transform 0.25s ease;
+  }
+}

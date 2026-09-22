@@ -52,10 +52,20 @@ export type SimulationWarningCode =
   | "taxRateOutOfRangeClamped"
   | "valueOverflowClamped";
 
+/** Parametri strutturati allegati agli avvisi con parti dinamiche, per consentire la localizzazione lato UI. */
+export interface SimulationWarningParams {
+  /** Campo di input a cui si riferisce l'avviso (per negativeAmountClamped). */
+  field?: "initialCapital" | "periodicAmount";
+  /** Anni del cap temporale (per timeWindowCappedForSafety). */
+  years?: number;
+}
+
 export interface SimulationWarning {
   code: SimulationWarningCode;
   /** Messaggio descrittivo in italiano (coerente con il resto della UI), sempre retrospettivo, mai prescrittivo. */
   message: string;
+  /** Parametri strutturati per la localizzazione del messaggio lato UI. Presente solo sugli avvisi con parti dinamiche. */
+  params?: SimulationWarningParams;
 }
 
 export interface SimulationResult {
@@ -141,13 +151,19 @@ function finiteOr0(n: number): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+const FIELD_LABELS: Record<"initialCapital" | "periodicAmount", string> = {
+  initialCapital: "Capitale iniziale",
+  periodicAmount: "Importo periodico",
+};
+
 /** Clampa un numero non negativo, gestendo anche `NaN`/`Infinity` in input, con avviso se ha dovuto correggere. */
-function sanitizeNonNegative(value: unknown, warnings: SimulationWarning[], fieldLabel: string): number {
+function sanitizeNonNegative(value: unknown, warnings: SimulationWarning[], field: "initialCapital" | "periodicAmount"): number {
   const n = typeof value === "number" ? value : Number(value);
   if (!Number.isFinite(n) || n < 0) {
     warnings.push({
       code: "negativeAmountClamped",
-      message: `${fieldLabel} non valido o negativo: impostato a 0.`,
+      message: `${FIELD_LABELS[field]} non valido o negativo: impostato a 0.`,
+      params: { field },
     });
     return 0;
   }
@@ -241,11 +257,12 @@ function runSimulation(input: SimulationInput): SimulationResult {
     warnings.push({
       code: "timeWindowCappedForSafety",
       message: `Finestra temporale troppo ampia: limitata a ${MAX_MONTHS / 12} anni.`,
+      params: { years: MAX_MONTHS / 12 },
     });
   }
 
-  const initialCapital = sanitizeNonNegative(input.initialCapital, warnings, "Capitale iniziale");
-  const periodicAmount = sanitizeNonNegative(input.periodicAmount, warnings, "Importo periodico");
+  const initialCapital = sanitizeNonNegative(input.initialCapital, warnings, "initialCapital");
+  const periodicAmount = sanitizeNonNegative(input.periodicAmount, warnings, "periodicAmount");
 
   const rawTaxRate = typeof input.taxRate === "number" ? input.taxRate : Number(input.taxRate);
   let taxRatePct = Number.isFinite(rawTaxRate) ? rawTaxRate : 0;

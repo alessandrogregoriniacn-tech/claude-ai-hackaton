@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { THEME_KEY, type Theme } from "@/lib/theme";
+import { useI18n } from "./I18nProvider";
 
 function getInitialTheme(): Theme {
   if (typeof document === "undefined") return "light";
@@ -14,6 +15,7 @@ export function ThemeToggle() {
   // dopo il mount leggiamo il tema realmente applicato dallo script inline.
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<Theme>("light");
+  const { t } = useI18n();
 
   // Il tema reale è nel DOM (impostato da uno script inline): lettura
   // intenzionale dopo il mount per non divergere dall'HTML prerenderizzato.
@@ -36,7 +38,7 @@ export function ThemeToggle() {
   }
 
   const isDark = theme === "dark";
-  const label = isDark ? "Passa al tema chiaro" : "Passa al tema scuro";
+  const label = isDark ? t.themeToggle.toLight : t.themeToggle.toDark;
 
   return (
     <button
