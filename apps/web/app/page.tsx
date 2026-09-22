@@ -1,13 +1,11 @@
 import Link from "next/link";
-import { ANNUAL_RETURN_RATE } from "@/lib/constants";
-import { formatPercent } from "@/lib/format";
 
 const SECTIONS = [
   {
     href: "/simulazione",
     title: "Simulazione",
     description:
-      "Inserisci una spesa ricorrente (importo, frequenza e data d'inizio) e scopri quanto avresti oggi se l'avessi investita, con un rendimento annuo fisso.",
+      "Inserisci un capitale iniziale, una spesa ricorrente e una finestra temporale, scegli lo strumento e scopri quanto avresti oggi se l'avessi investita.",
     cta: "Avvia una simulazione",
   },
   {
@@ -38,8 +36,8 @@ export default function HomePage() {
           Hagenton è un simulatore <strong>retrospettivo</strong>: invece di
           promettere guadagni futuri, guarda al passato. Ti mostra quanto avresti
           oggi se una piccola spesa ricorrente — il caffè al bar, un abbonamento,
-          lo snack quotidiano — l'avessi messa da parte e investita a un rendimento
-          annuo fisso del {formatPercent(ANNUAL_RETURN_RATE)}.
+          lo snack quotidiano — l&apos;avessi messa da parte e investita nello
+          strumento che preferisci.
         </p>
         <Link
           href="/simulazione"
@@ -50,7 +48,7 @@ export default function HomePage() {
       </section>
 
       <section className="mt-10">
-        <h2 className="text-lg font-semibold">Le sezioni dell'app</h2>
+        <h2 className="text-lg font-semibold">Le sezioni dell&apos;app</h2>
         <p className="mt-1 text-muted">
           Tre spazi, un unico obiettivo: rendere tangibile il costo delle piccole
           spese nel tempo.
@@ -74,9 +72,9 @@ export default function HomePage() {
       </section>
 
       <footer className="mt-12 border-t border-border pt-6 text-xs text-muted">
-        Simulazione a scopo illustrativo. Rendimento annuo fisso ipotetico del{" "}
-        {formatPercent(ANNUAL_RETURN_RATE)}, capitalizzazione mensile. Nessun dato
-        lascia il tuo browser: gli scenari sono salvati in locale.
+        Simulazione a scopo illustrativo. Rendimenti annui ipotetici con
+        capitalizzazione mensile. Nessun dato lascia il tuo browser: gli scenari
+        sono salvati in locale.
       </footer>
     </main>
   );

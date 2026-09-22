@@ -2,24 +2,37 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { simulateRetrospective, type Frequency } from "@/lib/finance";
+import { simulate, type Instrument, type Periodicity } from "@/lib/finance";
 import { formatCurrency } from "@/lib/format";
 import { loadScenarios, saveScenarios, type Scenario } from "@/lib/storage";
 
-const FREQUENCY_LABELS: Record<Frequency, string> = {
-  daily: "al giorno",
-  weekly: "a settimana",
-  monthly: "al mese",
+const PERIODICITY_LABELS: Record<Periodicity, string> = {
+  "1w": "ogni settimana",
+  "2w": "ogni 2 settimane",
+  "1m": "ogni mese",
+  "3m": "ogni 3 mesi",
+  "6m": "ogni 6 mesi",
+  "12m": "ogni 12 mesi",
+};
+
+const INSTRUMENT_LABELS: Record<Instrument, string> = {
+  azionaria: "Azionaria",
+  obbligazionaria: "Obbligazionaria",
+  bitcoin: "Bitcoin",
 };
 
 export default function StoricoPage() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [ready, setReady] = useState(false);
 
+  // Gli scenari vivono in localStorage: lettura intenzionale dopo il mount
+  // (non disponibile lato prerender statico).
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setScenarios(loadScenarios());
     setReady(true);
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   function handleDelete(id: string) {
     const next = scenarios.filter((s) => s.id !== id);
@@ -71,10 +84,15 @@ export default function StoricoPage() {
       ) : (
         <ul className="space-y-2">
           {scenarios.map((s) => {
-            const r = simulateRetrospective({
-              amount: s.amount,
-              frequency: s.frequency,
+            const r = simulate({
+              initialCapital: s.initialCapital,
+              periodicAmount: s.periodicAmount,
+              periodicity: s.periodicity,
               startDate: s.startDate,
+              endDate: s.endDate,
+              instrument: s.instrument,
+              adjustForInflation: s.adjustForInflation,
+              taxRate: s.taxRate,
             });
             return (
               <li
@@ -84,9 +102,14 @@ export default function StoricoPage() {
                 <div>
                   <p className="font-medium">{s.label}</p>
                   <p className="text-sm text-muted">
-                    {formatCurrency(s.amount, true)}{" "}
-                    {FREQUENCY_LABELS[s.frequency]} · dal{" "}
+                    {INSTRUMENT_LABELS[s.instrument]} ·{" "}
+                    {formatCurrency(s.periodicAmount, true)}{" "}
+                    {PERIODICITY_LABELS[s.periodicity]} · dal{" "}
                     {new Date(`${s.startDate}T00:00:00`).toLocaleDateString(
+                      "it-IT",
+                    )}{" "}
+                    al{" "}
+                    {new Date(`${s.endDate}T00:00:00`).toLocaleDateString(
                       "it-IT",
                     )}
                   </p>

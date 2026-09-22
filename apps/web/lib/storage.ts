@@ -1,12 +1,17 @@
 import { STORAGE_KEY } from "./constants";
-import type { Frequency } from "./finance";
+import type { Instrument, Periodicity } from "./finance";
 
 export interface Scenario {
   id: string;
   label: string;
-  amount: number;
-  frequency: Frequency;
+  initialCapital: number;
+  periodicAmount: number;
+  periodicity: Periodicity;
   startDate: string;
+  endDate: string;
+  instrument: Instrument;
+  adjustForInflation: boolean;
+  taxRate: number;
   createdAt: string;
 }
 

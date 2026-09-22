@@ -1,21 +1,29 @@
 import Link from "next/link";
-import { ANNUAL_RETURN_RATE } from "@/lib/constants";
+import { INSTRUMENT_RETURNS } from "@/lib/constants";
 import { formatPercent } from "@/lib/format";
 
 const FAQS = [
   {
     q: "Che cos'è Hagenton?",
-    a: "È un simulatore retrospettivo di risparmio. Prende una spesa ricorrente e ti mostra quanto avresti accumulato oggi se, invece di spenderla, l'avessi investita a un rendimento annuo fisso.",
+    a: "È un simulatore retrospettivo di risparmio. Prende un capitale iniziale e una spesa ricorrente e ti mostra quanto avresti accumulato oggi se, invece di spenderli, li avessi investiti nello strumento scelto.",
   },
   {
     q: "Come viene calcolato il risultato?",
-    a: `Ogni versamento viene sommato mese per mese e fatto crescere con capitalizzazione mensile equivalente a un rendimento annuo fisso del ${formatPercent(
-      ANNUAL_RETURN_RATE,
-    )}. Il valore finale è la somma dei versamenti più il rendimento maturato.`,
+    a: `Il capitale iniziale e ogni versamento vengono fatti crescere mese per mese con capitalizzazione mensile, secondo il rendimento annuo dello strumento scelto: Azionaria ${formatPercent(
+      INSTRUMENT_RETURNS.azionaria,
+    )}, Obbligazionaria ${formatPercent(
+      INSTRUMENT_RETURNS.obbligazionaria,
+    )}, Bitcoin ${formatPercent(
+      INSTRUMENT_RETURNS.bitcoin,
+    )}. Al valore finale si sottrae l'eventuale tassazione sui guadagni.`,
+  },
+  {
+    q: "Cosa cambia con inflazione e tassazione?",
+    a: "Se attivi «Tieni conto dell'inflazione», i valori sono espressi in termini reali (potere d'acquisto di oggi). La «Tassazione finale» applica l'aliquota indicata sui soli guadagni, così vedi il netto che ti resterebbe in tasca.",
   },
   {
     q: "Il rendimento è realistico?",
-    a: "È un'ipotesi illustrativa e costante, utile per rendere tangibile l'effetto del tempo. I mercati reali non offrono rendimenti fissi e garantiti: i risultati non sono una previsione né un consiglio finanziario.",
+    a: "Sono ipotesi illustrative e costanti, utili per rendere tangibile l'effetto del tempo. I mercati reali non offrono rendimenti fissi e garantiti: i risultati non sono una previsione né un consiglio finanziario.",
   },
   {
     q: "I miei dati sono al sicuro?",
@@ -65,7 +73,7 @@ export default function FaqPage() {
       <div className="mt-10 rounded-card bg-accent px-6 py-8 text-accent-foreground">
         <h2 className="text-lg font-semibold">Pronto a provare?</h2>
         <p className="mt-1 text-sm">
-          Bastano un importo e una data per vedere l'effetto del tempo.
+          Bastano un importo e una data per vedere l&apos;effetto del tempo.
         </p>
         <Link
           href="/simulazione"

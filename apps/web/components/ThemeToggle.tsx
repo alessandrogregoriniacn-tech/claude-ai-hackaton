@@ -15,10 +15,14 @@ export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<Theme>("light");
 
+  // Il tema reale è nel DOM (impostato da uno script inline): lettura
+  // intenzionale dopo il mount per non divergere dall'HTML prerenderizzato.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setTheme(getInitialTheme());
     setMounted(true);
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   function toggle() {
     const next: Theme = theme === "dark" ? "light" : "dark";
