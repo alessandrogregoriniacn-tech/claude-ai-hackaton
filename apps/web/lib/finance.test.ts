@@ -69,7 +69,19 @@ describe("simulate — checklist a prova di utente", () => {
 
   it("importo negativo in input viene clampato a 0, mai propagato", () => {
     const result = simulate(baseInput({ initialCapital: -500, periodicAmount: -50 }));
-    expect(result.warnings.filter((w) => w.code === "negativeAmountClamped").length).toBe(2);
+    const clamped = result.warnings.filter((w) => w.code === "negativeAmountClamped");
+    expect(clamped.length).toBe(2);
+    // Il messaggio italiano deve restare invariato
+    expect(clamped.find((w) => w.params?.field === "initialCapital")?.message).toBe(
+      "Capitale iniziale non valido o negativo: impostato a 0.",
+    );
+    expect(clamped.find((w) => w.params?.field === "periodicAmount")?.message).toBe(
+      "Importo periodico non valido o negativo: impostato a 0.",
+    );
+    // params strutturati presenti
+    const fields = clamped.map((w) => w.params?.field);
+    expect(fields).toContain("initialCapital");
+    expect(fields).toContain("periodicAmount");
     expect(result.points[0].value).toBe(0);
     expectNoNaNOrInfinity(result);
   });
@@ -110,7 +122,12 @@ describe("simulate — checklist a prova di utente", () => {
 
   it("finestra di decenni oltre il range di ogni dataset viene limitata per sicurezza", () => {
     const result = simulate(baseInput({ startDate: "1000-01-01", endDate: "9999-01-01" }));
-    expect(result.warnings.some((w) => w.code === "timeWindowCappedForSafety")).toBe(true);
+    const capWarning = result.warnings.find((w) => w.code === "timeWindowCappedForSafety");
+    expect(capWarning).toBeDefined();
+    // params.years deve corrispondere al cap in anni (100)
+    expect(capWarning?.params?.years).toBe(100);
+    // Il messaggio italiano deve restare invariato
+    expect(capWarning?.message).toBe("Finestra temporale troppo ampia: limitata a 100 anni.");
     expectNoNaNOrInfinity(result);
   });
 

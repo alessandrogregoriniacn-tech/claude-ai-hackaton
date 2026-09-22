@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MonthlyPoint } from "@/lib/finance";
-import { formatCurrency } from "@/lib/format";
+import { useI18n } from "./I18nProvider";
 
 interface GrowthChartProps {
   points: MonthlyPoint[];
@@ -21,29 +21,6 @@ const AXIS_LABEL_SIZE = 11;
 /** Opacità del riempimento dell'area sotto la curva del valore. */
 const AREA_FILL_OPACITY = 0.35;
 
-const MONTH_LABELS = [
-  "gen",
-  "feb",
-  "mar",
-  "apr",
-  "mag",
-  "giu",
-  "lug",
-  "ago",
-  "set",
-  "ott",
-  "nov",
-  "dic",
-];
-
-/** "YYYY-MM" → "mmm YYYY" (es. "2020-03" → "mar 2020"). */
-function formatMonthLabel(month: string): string {
-  const [y, m] = month.split("-");
-  const idx = Number(m) - 1;
-  if (!y || Number.isNaN(idx) || idx < 0 || idx > 11) return month;
-  return `${MONTH_LABELS[idx]} ${y}`;
-}
-
 interface ChartBodyProps {
   points: MonthlyPoint[];
   /** True quando è renderizzato dentro la modale a schermo intero. */
@@ -57,6 +34,7 @@ interface ChartBodyProps {
  * proprio stato (finestra visibile, hover): inline e modale sono indipendenti.
  */
 function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
+  const { t, fmtCurrency, formatMonthLabel } = useI18n();
   const svgRef = useRef<SVGSVGElement>(null);
 
   // Finestra visibile [start, end] come indici nei punti: è ciò che lo zoom e
@@ -114,7 +92,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
     });
 
     return { visible, x, y, valuePath, contributedPath, areaPath, gridLines, xTicks, innerH };
-  }, [points, start, end, total]);
+  }, [points, start, end, total, formatMonthLabel]);
 
   /** Indice (nella finestra visibile) più vicino alla coordinata X del mouse. */
   const indexFromEvent = useCallback(
@@ -201,7 +179,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
   if (total < 2 || !chart) {
     return (
       <div className="flex h-[280px] items-center justify-center rounded-card border border-border bg-surface text-sm text-muted">
-        Imposta i parametri per vedere la crescita nel tempo.
+        {t.chart.empty}
       </div>
     );
   }
@@ -222,7 +200,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
           onClick={() => pan(-Math.max(1, Math.round((end - start) / 4)))}
           disabled={start <= 0}
           className={controlClass}
-          aria-label="Scorri indietro nel tempo"
+          aria-label={t.chart.panBack}
         >
           <span aria-hidden="true">‹</span>
         </button>
@@ -231,7 +209,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
           onClick={() => pan(Math.max(1, Math.round((end - start) / 4)))}
           disabled={end >= total - 1}
           className={controlClass}
-          aria-label="Scorri avanti nel tempo"
+          aria-label={t.chart.panForward}
         >
           <span aria-hidden="true">›</span>
         </button>
@@ -240,7 +218,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
           onClick={() => zoom(1 / 1.6)}
           disabled={!canZoomIn}
           className={controlClass}
-          aria-label="Ingrandisci il periodo"
+          aria-label={t.chart.zoomIn}
         >
           <span aria-hidden="true">+</span>
         </button>
@@ -249,7 +227,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
           onClick={() => zoom(1.6)}
           disabled={!canZoomOut}
           className={controlClass}
-          aria-label="Riduci lo zoom"
+          aria-label={t.chart.zoomOut}
         >
           <span aria-hidden="true">−</span>
         </button>
@@ -259,15 +237,17 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
           disabled={start <= 0 && end >= total - 1}
           className={controlClass}
         >
-          Reset
+          {t.chart.reset}
         </button>
         <button
           type="button"
           onClick={onToggle}
           className={`${controlClass} ml-auto`}
-          aria-label={isModal ? "Chiudi la vista a schermo intero" : "Apri a schermo intero"}
+          aria-label={
+            isModal ? t.chart.fullscreenCloseAria : t.chart.fullscreenOpenAria
+          }
         >
-          {isModal ? "Chiudi" : "Schermo intero"}
+          {isModal ? t.chart.fullscreenClose : t.chart.fullscreen}
         </button>
       </div>
 
@@ -279,7 +259,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
             isModal ? "max-h-[72vh]" : ""
           }`}
           role="img"
-          aria-label="Crescita del capitale nel tempo"
+          aria-label={t.chart.ariaGrowth}
           onMouseMove={handleMove}
           onMouseLeave={() => setHover(null)}
           onMouseDown={(e) => {
@@ -306,7 +286,7 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
                 fontSize={AXIS_LABEL_SIZE}
                 fill="var(--color-muted)"
               >
-                {formatCurrency(g.v)}
+                {fmtCurrency(g.v)}
               </text>
             </g>
           ))}
@@ -360,11 +340,11 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
             <p className="font-semibold text-foreground">{formatMonthLabel(hoverPoint.month)}</p>
             <p className="mt-1 tabular-nums text-foreground">
               <span className="inline-block h-2 w-2 rounded-full bg-primary align-middle" />{" "}
-              Con rendimento: {formatCurrency(hoverPoint.value)}
+              {t.chart.withReturn}: {fmtCurrency(hoverPoint.value)}
             </p>
             <p className="tabular-nums text-muted">
-              <span className="inline-block h-2 w-2 rounded-full bg-muted align-middle" /> Solo
-              versato: {formatCurrency(hoverPoint.contributed)}
+              <span className="inline-block h-2 w-2 rounded-full bg-muted align-middle" />{" "}
+              {t.chart.onlyContributed}: {fmtCurrency(hoverPoint.contributed)}
             </p>
           </div>
         ) : null}
@@ -372,21 +352,20 @@ function ChartBody({ points, isModal, onToggle }: ChartBodyProps) {
 
       <div className="mt-2 flex flex-wrap gap-6 px-2 text-xs text-muted">
         <span className="flex items-center gap-2">
-          <span className="inline-block h-0.5 w-4 bg-primary" /> Con rendimento
+          <span className="inline-block h-0.5 w-4 bg-primary" /> {t.chart.withReturn}
         </span>
         <span className="flex items-center gap-2">
-          <span className="inline-block h-0.5 w-4 border-t-2 border-dashed border-muted" /> Solo
-          versato
+          <span className="inline-block h-0.5 w-4 border-t-2 border-dashed border-muted" />{" "}
+          {t.chart.onlyContributed}
         </span>
-        <span className="ml-auto hidden sm:inline">
-          Trascina per scorrere · rotellina per zoomare
-        </span>
+        <span className="ml-auto hidden sm:inline">{t.chart.dragHint}</span>
       </div>
     </div>
   );
 }
 
 export function GrowthChart({ points }: GrowthChartProps) {
+  const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
 
   // Con la modale aperta: Esc per chiudere e blocco dello scroll del body.
@@ -412,7 +391,7 @@ export function GrowthChart({ points }: GrowthChartProps) {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Grafico della crescita a schermo intero"
+          aria-label={t.chart.fullscreenDialogAria}
           className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) setExpanded(false);

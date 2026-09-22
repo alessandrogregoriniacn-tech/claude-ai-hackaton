@@ -1,4 +1,7 @@
+"use client";
+
 import type { SimulationWarning } from "@/lib/finance";
+import { useI18n } from "./I18nProvider";
 
 interface WarningBannerProps {
   warnings: SimulationWarning[];
@@ -11,8 +14,12 @@ interface WarningBannerProps {
  * temporale troncata, strumento non più disponibile, dati mancanti, ecc.).
  * Linguaggio sempre descrittivo/retrospettivo, mai allarmistico: sono
  * correzioni automatiche del motore, non errori dell'utente.
+ *
+ * I messaggi sono localizzati (IT/EN) a partire da `code` + `params`
+ * strutturati dell'avviso, non dal testo `message` del motore.
  */
 export function WarningBanner({ warnings, compact = false }: WarningBannerProps) {
+  const { t } = useI18n();
   if (warnings.length === 0) return null;
 
   return (
@@ -24,11 +31,13 @@ export function WarningBanner({ warnings, compact = false }: WarningBannerProps)
     >
       <p className="flex items-center gap-2 font-semibold text-negative">
         <span aria-hidden="true">⚠</span>
-        Nota sui dati usati
+        {t.warning.title}
       </p>
       <ul className={`${compact ? "mt-1" : "mt-2"} list-inside list-disc space-y-1 text-muted`}>
         {warnings.map((w, i) => (
-          <li key={`${w.code}-${i}`}>{w.message}</li>
+          <li key={`${w.code}-${i}`}>
+            {t.warning.messages[w.code](w.params)}
+          </li>
         ))}
       </ul>
     </div>
