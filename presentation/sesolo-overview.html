@@ -79,13 +79,6 @@
   .step-body h3 { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
   .step-body p { font-size: 13.5px; line-height: 1.55; color: rgba(255,255,255,0.65); }
 
-  /* Stack pills */
-  .stack-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .stack-row { border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); border-radius: 12px; padding: 16px 18px; }
-  .stack-row .label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--purple-light); margin-bottom: 10px; }
-  .stack-row .items { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pill { border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.05); border-radius: 99px; padding: 5px 13px; font-size: 13px; color: rgba(255,255,255,0.85); }
-
   /* Links */
   .link-grid { display: flex; flex-direction: column; gap: 14px; }
   .link-card { display: flex; align-items: center; gap: 18px; border: 1px solid rgba(161,0,255,0.25); background: rgba(161,0,255,0.06); border-radius: 14px; padding: 18px 22px; text-decoration: none; transition: border-color .2s, background .2s, transform .2s; }
@@ -129,8 +122,8 @@
         <h2 class="cover-title"><span class="text-gradient">SeSolo</span><br>Il costo-opportunità del non risparmiare</h2>
         <p class="cover-subtitle">Un simulatore retrospettivo che mostra quanto si sarebbe accumulato investendo in passato. Educare, non consigliare.</p>
         <div class="chips">
-          <span class="chip">L'applicativo</span>
-          <span class="chip">Stack tecnico</span>
+          <span class="chip">L'idea</span>
+          <span class="chip">Il prodotto</span>
           <span class="chip">Focus agentico</span>
           <span class="chip">Link &amp; demo</span>
           <span class="chip">Ringraziamenti</span>
@@ -143,103 +136,106 @@
   <div class="slide" data-index="1">
     <div class="slide-stage"><div class="slide-content">
       <div class="cover-center">
-        <span class="kicker">Sezione 1 · L'applicativo</span>
-        <h2 class="closing-title">Cos'è <span class="text-gradient">SeSolo</span> e a cosa serve</h2>
-        <p class="cover-subtitle">Utilità, funzionamento e possibili evoluzioni future.</p>
+        <span class="kicker">Sezione 1 · L'idea e il prodotto</span>
+        <h2 class="closing-title">Perché nasce <span class="text-gradient">SeSolo</span> e cosa fa</h2>
+        <p class="cover-subtitle">Dal problema dell'utente all'esperienza concreta, fino alle evoluzioni future.</p>
       </div>
     </div></div>
   </div>
 
-  <!-- 2 · L'applicativo -->
+  <!-- 2 · Il problema / utente -->
   <div class="slide" data-index="2">
     <div class="slide-stage"><div class="slide-content">
       <div class="slide-header">
-        <span class="kicker">Il concept</span>
+        <span class="kicker">Il problema</span>
+        <h2>Il risparmio è <em>astratto</em>, e per questo rimandato</h2>
+        <p class="subtitle">Chi non ha dimestichezza con la finanza non "vede" cosa gli costa non risparmiare: mancando un riscontro concreto, la scelta di iniziare viene continuamente posticipata.</p>
+      </div>
+      <ul class="bullets">
+        <li><span class="bullet-num">1</span><span><b>Il costo-opportunità è invisibile.</b> "10 € a settimana" sembrano pochi: nessuno percepisce quanto diventerebbero nel tempo grazie alla capitalizzazione.</span></li>
+        <li><span class="bullet-num">2</span><span><b>L'inflazione erode in silenzio.</b> I soldi fermi perdono potere d'acquisto anno dopo anno, ma è un effetto che non si tocca con mano.</span></li>
+        <li><span class="bullet-num">3</span><span><b>Il linguaggio finanziario intimidisce.</b> Rendimento, volatilità, tassazione: barriere che allontanano proprio chi ne avrebbe più bisogno.</span></li>
+        <li><span class="bullet-num">4</span><span><b>Gli strumenti esistenti "vendono".</b> La maggior parte spinge a comprare un prodotto; manca uno spazio puramente educativo e neutrale.</span></li>
+      </ul>
+      <p class="note"><b>User Difficulty Statement:</b> una persona senza esperienza finanziaria non riesce a stimare il costo del non risparmiare, e in assenza di un riscontro tangibile continua a rimandare la decisione.</p>
+    </div></div>
+  </div>
+
+  <!-- 3 · Il concept -->
+  <div class="slide" data-index="3">
+    <div class="slide-stage"><div class="slide-content">
+      <div class="slide-header">
+        <span class="kicker">L'idea</span>
         <h2>Un simulatore <em>retrospettivo</em>, non prescrittivo</h2>
-        <p class="subtitle">Cambia la prospettiva sul risparmio: "ecco cosa sarebbe successo", mai "ecco cosa dovresti fare".</p>
+        <p class="subtitle">SeSolo non chiede "quanto vuoi guadagnare domani": mostra cosa sarebbe successo se avessi iniziato ieri. È un cambio di prospettiva, non uno strumento di investimento.</p>
       </div>
       <ul class="bullets">
         <li><span class="bullet-num">1</span><span>L'utente sceglie <b>importo</b>, <b>frequenza</b> (giornaliera/settimanale/mensile) e <b>data di inizio nel passato</b>.</span></li>
         <li><span class="bullet-num">2</span><span>L'app calcola quanto quel capitale varrebbe <b>oggi</b> su dati storici reali, con <b>inflazione</b> e <b>tassazione</b> opzionali.</span></li>
-        <li><span class="bullet-num">3</span><span>Distingue <b>totale versato</b>, <b>valore con rendimento</b> e <b>guadagno</b> — reso visivo con grafici di crescita.</span></li>
-        <li><span class="bullet-num">4</span><span>Vincolo non negoziabile del tema: <b>mai raccomandazioni di investimento</b>. Framing sempre illustrativo/educativo.</span></li>
+        <li><span class="bullet-num">3</span><span>Distingue con chiarezza <b>totale versato</b>, <b>valore con rendimento</b> e <b>guadagno</b> — il tutto reso visivo con grafici di crescita.</span></li>
+        <li><span class="bullet-num">4</span><span>Vincolo non negoziabile del tema: <b>mai raccomandazioni di investimento</b>. Il framing resta sempre illustrativo ed educativo.</span></li>
       </ul>
-      <p class="note"><b>Obiettivo educativo:</b> far percepire il costo-opportunità del non risparmiare a chi non ha dimestichezza con la finanza — un cambio di prospettiva, non uno strumento di investimento.</p>
+      <p class="note"><b>La forza dell'approccio:</b> guardare al passato elimina l'incertezza della previsione. I numeri sono fatti storici, non promesse — così il messaggio educativo resta credibile e mai fuorviante.</p>
     </div></div>
   </div>
 
-  <!-- 3 · Utilità / come funziona -->
-  <div class="slide" data-index="3">
+  <!-- 4 · Cosa può fare l'utente -->
+  <div class="slide" data-index="4">
     <div class="slide-stage"><div class="slide-content">
       <div class="slide-header">
-        <span class="kicker">Utilità · funzionalità</span>
+        <span class="kicker">Il prodotto · funzionalità</span>
         <h2>Cosa può fare l'utente</h2>
-        <p class="subtitle">Strumenti storici a confronto, tutto client-side e senza barriere d'ingresso.</p>
+        <p class="subtitle">Strumenti storici a confronto, senza account e senza barriere d'ingresso: si apre e si prova.</p>
       </div>
       <div class="cards-grid three">
-        <div class="card"><span class="tag">Strumenti</span><h3>5 strumenti storici</h3><p>Azionario globale, Titoli di Stato 10y, Bilanciato 60/40, Bitcoin, Libretto postale — dataset statici reali.</p></div>
-        <div class="card"><span class="tag">Realismo</span><h3>Inflazione &amp; tasse</h3><p>Serie di inflazione e tassazione opzionali per un valore reale, non solo nominale.</p></div>
-        <div class="card"><span class="tag">Confronto</span><h3>Pagina "Confronta"</h3><p>Più strumenti affiancati sullo stesso scenario per capire le differenze.</p></div>
-        <div class="card"><span class="tag">Persistenza</span><h3>Storico scenari</h3><p>Simulazioni salvate nel browser via localStorage — nessun account, nessun backend.</p></div>
-        <div class="card"><span class="tag">Accesso</span><h3>Multilingua &amp; temi</h3><p>Italiano/Inglese, dark/light mode, accessibilità WCAG 2.2 AA.</p></div>
-        <div class="card"><span class="tag">Export</span><h3>Download Excel</h3><p>Esportazione dei risultati in .xlsx per approfondire o condividere.</p></div>
+        <div class="card"><span class="tag">Strumenti</span><h3>5 strumenti storici</h3><p>Azionario globale, Titoli di Stato 10y, Bilanciato 60/40, Bitcoin, Libretto postale — dataset statici reali e documentati.</p></div>
+        <div class="card"><span class="tag">Realismo</span><h3>Inflazione &amp; tasse</h3><p>Serie di inflazione e tassazione opzionali, per leggere il valore reale e non solo quello nominale.</p></div>
+        <div class="card"><span class="tag">Confronto</span><h3>Pagina "Confronta"</h3><p>Più strumenti affiancati sullo stesso scenario, per capire a colpo d'occhio le differenze.</p></div>
+        <div class="card"><span class="tag">Persistenza</span><h3>Storico scenari</h3><p>Simulazioni salvate nel browser: nessun account, nessun dato che lascia il dispositivo.</p></div>
+        <div class="card"><span class="tag">Accesso</span><h3>Multilingua &amp; temi</h3><p>Italiano/Inglese, dark/light mode e accessibilità WCAG 2.2 AA: inclusivo per definizione.</p></div>
+        <div class="card"><span class="tag">Export</span><h3>Download Excel</h3><p>Esportazione dei risultati in .xlsx per approfondire, salvare o condividere con altri.</p></div>
       </div>
     </div></div>
   </div>
 
-  <!-- 4 · Future evolutive -->
-  <div class="slide" data-index="4">
+  <!-- 5 · Esempio concreto / before-after -->
+  <div class="slide" data-index="5">
+    <div class="slide-stage"><div class="slide-content">
+      <div class="slide-header">
+        <span class="kicker">Il prodotto · un caso concreto</span>
+        <h2>Da un numero astratto a una scelta comprensibile</h2>
+        <p class="subtitle">Lo stesso dato, raccontato prima come cifra qualunque e poi come costo-opportunità reso evidente dalla simulazione.</p>
+      </div>
+      <div class="cards-grid">
+        <div class="card"><span class="tag">Prima</span><h3>"Sono solo 10 € a settimana"</h3><p>Una spesa ricorrente che sembra trascurabile. Nessuno strumento la collega a ciò che avrebbe potuto diventare: il risparmio resta un buon proposito senza urgenza.</p></div>
+        <div class="card"><span class="tag">Dopo</span><h3>Il costo-opportunità reso visibile</h3><p>SeSolo mostra su dati storici quanto quei versamenti varrebbero oggi, separando capitale versato e rendimento. Il grafico rende immediato ciò che una cifra non diceva.</p></div>
+      </div>
+      <p class="note"><b>Before/After Simplicity Evidence:</b> non aggiungiamo informazioni, ne cambiamo la leggibilità. La stessa scelta quotidiana passa da "irrilevante" a "concreta" senza mai suggerire cosa fare.</p>
+    </div></div>
+  </div>
+
+  <!-- 6 · Future evolutive -->
+  <div class="slide" data-index="6">
     <div class="slide-stage"><div class="slide-content">
       <div class="slide-header">
         <span class="kicker">Roadmap</span>
         <h2>Possibili evoluzioni future</h2>
-        <p class="subtitle">Direzioni coerenti col vincolo educativo del tema.</p>
+        <p class="subtitle">Direzioni coerenti con il vincolo educativo del tema: più tangibilità, mai più prescrizione.</p>
       </div>
       <div class="steps">
         <div class="step"><span class="step-num">01</span><div class="step-body"><h3>Più strumenti e dataset aggiornabili</h3><p>Ampliare il paniere (ETF tematici, oro, immobiliare) mantenendo la provenienza documentata dei dati.</p></div></div>
-        <div class="step"><span class="step-num">02</span><div class="step-body"><h3>Scenari "spesa reale"</h3><p>Partire da spese ricorrenti concrete (caffè, abbonamenti) per rendere il costo-opportunità ancora più tangibile.</p></div></div>
-        <div class="step"><span class="step-num">03</span><div class="step-body"><h3>Condivisione &amp; storytelling</h3><p>Card condivisibili e narrazione guidata dei risultati, sempre in chiave illustrativa.</p></div></div>
-        <div class="step"><span class="step-num">04</span><div class="step-body"><h3>Percorso educativo</h3><p>Micro-contenuti su inflazione, capitalizzazione e diversificazione integrati nel flusso.</p></div></div>
+        <div class="step"><span class="step-num">02</span><div class="step-body"><h3>Scenari "spesa reale"</h3><p>Partire da spese ricorrenti concrete (caffè, abbonamenti) per rendere il costo-opportunità ancora più tangibile e personale.</p></div></div>
+        <div class="step"><span class="step-num">03</span><div class="step-body"><h3>Condivisione &amp; storytelling</h3><p>Card condivisibili e narrazione guidata dei risultati, sempre in chiave illustrativa, per far girare il messaggio educativo.</p></div></div>
+        <div class="step"><span class="step-num">04</span><div class="step-body"><h3>Percorso educativo</h3><p>Micro-contenuti su inflazione, capitalizzazione e diversificazione integrati nel flusso, per imparare mentre si simula.</p></div></div>
       </div>
     </div></div>
   </div>
 
-  <!-- 5 · SEZIONE 2 divider -->
-  <div class="slide" data-index="5">
-    <div class="slide-stage"><div class="slide-content">
-      <div class="cover-center">
-        <span class="kicker">Sezione 2 · Stack tecnico</span>
-        <h2 class="closing-title">Le tecnologie <span class="text-gradient">sotto il cofano</span></h2>
-        <p class="cover-subtitle">Scelte guidate da un vincolo forte: nessun backend, nessuna rete a runtime.</p>
-      </div>
-    </div></div>
-  </div>
-
-  <!-- 6 · Stack tecnico -->
-  <div class="slide" data-index="6">
-    <div class="slide-stage"><div class="slide-content">
-      <div class="slide-header">
-        <span class="kicker">Stack tecnico</span>
-        <h2>100% client-side, zero backend</h2>
-        <p class="subtitle">Dati finanziari solo da dataset statici bundlati: nessuna chiamata API a runtime.</p>
-      </div>
-      <div class="stack-grid">
-        <div class="stack-row"><div class="label">Framework &amp; linguaggio</div><div class="items"><span class="pill">Next.js 16 · App Router</span><span class="pill">React 19</span><span class="pill">TypeScript</span></div></div>
-        <div class="stack-row"><div class="label">Styling &amp; design</div><div class="items"><span class="pill">Tailwind CSS</span><span class="pill">CSS variables / token</span><span class="pill">Dark / Light mode</span></div></div>
-        <div class="stack-row"><div class="label">Dati &amp; persistenza</div><div class="items"><span class="pill">Dataset statici</span><span class="pill">localStorage</span><span class="pill">Nessun DB / auth</span></div></div>
-        <div class="stack-row"><div class="label">Qualità &amp; tooling</div><div class="items"><span class="pill">Vitest + coverage</span><span class="pill">ESLint</span><span class="pill">ExcelJS export</span></div></div>
-        <div class="stack-row"><div class="label">i18n</div><div class="items"><span class="pill">Italiano / Inglese</span></div></div>
-        <div class="stack-row"><div class="label">Deploy</div><div class="items"><span class="pill">Next static export</span><span class="pill">Firebase Hosting</span></div></div>
-      </div>
-      <p class="note"><b>Motore di calcolo isolato:</b> tutta la logica finanziaria vive in <code>lib/finance.ts</code> come funzioni pure, indipendenti dalla UI e coperte da unit test.</p>
-    </div></div>
-  </div>
-
-  <!-- 7 · SEZIONE 3 divider -->
+  <!-- 7 · SEZIONE 2 divider -->
   <div class="slide" data-index="7">
     <div class="slide-stage"><div class="slide-content">
       <div class="cover-center">
-        <span class="kicker">Sezione 3 · Focus agentico</span>
+        <span class="kicker">Sezione 2 · Focus agentico</span>
         <h2 class="closing-title">Come abbiamo <span class="text-gradient">progettato Claude Code</span></h2>
         <p class="cover-subtitle">Agenti specializzati e skill: la disciplina del progetto diventa configurazione.</p>
       </div>
@@ -302,7 +298,7 @@
   <div class="slide" data-index="11">
     <div class="slide-stage"><div class="slide-content">
       <div class="slide-header">
-        <span class="kicker">Sezione 4 · Risorse</span>
+        <span class="kicker">Sezione 3 · Risorse</span>
         <h2>Link: design, codice e demo live</h2>
         <p class="subtitle">Tutto quello che serve per esplorare il progetto.</p>
       </div>
@@ -330,7 +326,7 @@
   <div class="slide" data-index="12">
     <div class="slide-stage"><div class="slide-content">
       <div class="slide-header">
-        <span class="kicker">Sezione 5 · Grazie</span>
+        <span class="kicker">Sezione 4 · Grazie</span>
         <h2>Ringraziamenti</h2>
         <p class="subtitle">Un progetto nato in poche ore, con tante persone dietro.</p>
       </div>
