@@ -10,19 +10,22 @@ Nessuna chiamata di rete a runtime: qui restano bundlati e versionati nel repo.
 | `sp500_tbond_annual_1928.csv` | `year,sp500_total_return,us_tbond_10y_return` | 1928 – 2025, **annuale** | [Damodaran — Historical Returns on Stocks, Bonds and Bills](https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/histretSP.html) |
 | `us_inflation_annual_1914.csv` | `year,inflation_rate` | 1914 – 2025, **annuale** | Stesso file Damodaran (foglio "Inflation Rate", fonte FRED CPI USA) |
 | `bitcoin.csv` | `Date,Price` | 2010-07-18 – oggi, **giornaliero** | [GitHub Habrador/Bitcoin-price-visualization](https://github.com/Habrador/Bitcoin-price-visualization) (fonte originale CoinGecko) |
-| `bot_3m_1980_2007.csv` | `date,gross_compound_yield_pct` | **1980 – 2007 soltanto** | Archivio ufficiale [MEF — Dipartimento del Tesoro](https://www.dt.mef.gov.it/it/debito_pubblico/dati_statistici/archivio_dati_storici/), risultati asta BOT 3 mesi |
-| `bot_6m_1980_2007.csv` | `date,gross_compound_yield_pct` | **1980 – 2007 soltanto** | Come sopra, BOT 6 mesi |
-| `bot_12m_1980_2007.csv` | `date,gross_compound_yield_pct` | **1980 – 2007 soltanto** | Come sopra, BOT 12 mesi |
+| `bot_weighted_avg_1981_2026.csv` | `date,gross_compound_yield_pct` | **1981 – 2026**, quindicinale, **quasi nessun buco** (1074 osservazioni) | Banca d'Italia — Base Dati Statistica, cubo `BOT0100`, serie "rendimento medio ponderato lordo composto" (tutte le scadenze aggregate). **Consigliata come proxy di default per "Libretto postale"**: è la serie più continua delle quattro. |
+| `bot_3m_1981_2026.csv` | `date,gross_compound_yield_pct` | 1983 – 2026, con buchi (452 osservazioni: non tutte le aste da 3 mesi sono state bandite in ogni periodo) | Come sopra, scadenza 3 mesi |
+| `bot_6m_1981_2026.csv` | `date,gross_compound_yield_pct` | 1984 – 2026, con buchi (658 osservazioni) | Come sopra, scadenza 6 mesi |
+| `bot_12m_1981_2026.csv` | `date,gross_compound_yield_pct` | 1988 – 2026, con buchi (599 osservazioni) | Come sopra, scadenza 12 mesi |
 
 ## Limiti noti (da tenere presente in fase di integrazione)
 
-- **BOT**: nessuna fonte scriptabile trovata per il periodo 2008–oggi (il portale
-  Banca d'Italia blocca l'accesso automatico, Eurostat non ha la serie popolata per
-  l'Italia). Lo strumento con label "Libretto postale" userà questa serie come proxy
-  di rischio/rendimento fino al 2007; oltre quella data va o esteso a mano
-  (istruzioni per l'export manuale da Banca d'Italia disponibili) o la finestra
-  temporale selezionabile va clampata al 2007 con avviso esplicito (vedi
-  `.claude/agents/finance-engine.md`, checklist "a prova di utente").
+- **BOT**: il portale Banca d'Italia blocca lo scraping automatico, ma l'export
+  manuale (Base Dati Statistica → cubo `BOT0100` → filtro periodo → Esporta) copre
+  **1981–2026 senza buchi rilevanti** sulla serie aggregata (`bot_weighted_avg`).
+  Usa quella come proxy per "Libretto postale"; le serie per singola scadenza
+  (3/6/12 mesi) hanno buchi reali perché non tutte le scadenze sono state bandite
+  in ogni periodo — non sono errori di parsing, vanno gestite come dati mancanti
+  legittimi (vedi checklist "a prova di utente" del `finance-engine`: finestra
+  temporale con dato mancante → clamp esplicito o fallback alla serie aggregata,
+  mai un buco silenzioso nel grafico).
 - **MSCI World**: cadenza trimestrale, non mensile — se il motore di calcolo itera
   mese per mese va gestita l'interpolazione o un rate composto sul periodo
   disponibile, non un semplice "valore mancante = 0".
