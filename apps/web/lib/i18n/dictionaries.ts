@@ -4,6 +4,7 @@ import type {
   SimulationWarningCode,
   SimulationWarningParams,
 } from "@/lib/finance";
+import type { FaqGroup } from "@/lib/faqSearch";
 
 /** Lingue supportate dall'interfaccia. */
 export type Lang = "it" | "en";
@@ -261,37 +262,238 @@ const it = {
   faq: {
     title: "Domande frequenti",
     subtitle:
-      "Come funziona SeSolo, da dove viene il rendimento e cosa succede ai tuoi dati.",
-    items: [
+      "Come funziona SeSolo, da dove vengono i dati storici usati per ogni strumento e cosa succede ai dati inseriti.",
+    groups: <FaqGroup[]>[
       {
-        q: "Che cos'è SeSolo?",
-        a: "È un simulatore retrospettivo di risparmio. Prende un capitale iniziale e una spesa ricorrente e ti mostra quanto avresti accumulato oggi se, invece di spenderli, li avessi investiti nello strumento scelto.",
+        title: "In generale",
+        items: [
+          {
+            id: "cosa-e-hagenton",
+            q: "Che cos'è SeSolo?",
+            a: "È un simulatore retrospettivo di risparmio. Prende un capitale iniziale e una spesa ricorrente e mostra quanto si sarebbe accumulato oggi se, invece di spenderli, fossero stati investiti nello strumento scelto.",
+            keywords: [
+              "sesolo",
+              "cos'è sesolo",
+              "a cosa serve l'app",
+              "simulatore di risparmio",
+              "come funziona l'app",
+            ],
+          },
+          {
+            id: "come-viene-calcolato",
+            q: "Come viene calcolato il risultato?",
+            a: "Il capitale iniziale e ogni versamento crescono mese per mese secondo l'andamento storico reale dello strumento scelto (dati di mercato effettivi, non un tasso ipotetico fisso uguale per tutti gli strumenti). Al valore finale si sottrae l'eventuale tassazione sui guadagni.",
+            keywords: [
+              "come funziona il calcolo",
+              "formula",
+              "metodo di calcolo",
+              "come si calcola il risultato",
+              "dati di mercato",
+              "andamento storico",
+            ],
+          },
+          {
+            id: "inflazione-e-tassazione",
+            q: "Cosa cambia con inflazione e tassazione?",
+            a: "Attivando «Tieni conto dell'inflazione», i valori vengono espressi in termini reali: a parità di potere d'acquisto con oggi, cioè al netto della perdita di valore della moneta nel tempo. Con inflazione disattivata i valori restano in termini nominali, cioè agli importi effettivi di ogni anno, senza questa correzione. La «Tassazione finale» applica l'aliquota scelta ai soli guadagni, mai al capitale versato: il risultato mostra il valore al netto delle imposte.",
+            keywords: [
+              "inflazione",
+              "tassazione",
+              "potere d'acquisto",
+              "valori reali",
+              "valori nominali",
+              "tasse sui guadagni",
+            ],
+          },
+          {
+            id: "rendimento-realistico",
+            q: "Il rendimento è realistico?",
+            a: "I calcoli usano serie storiche reali (indici azionari, titoli di Stato, Bitcoin, tassi di riferimento) per il periodo scelto, non un rendimento medio inventato: per questo il risultato cambia a seconda della finestra temporale selezionata, proprio come sarebbe successo davvero. Restano comunque dati passati: i mercati reali non offrono rendimenti garantiti, e i risultati non sono una previsione né un consiglio finanziario.",
+            keywords: [
+              "rendimento realistico",
+              "dati reali",
+              "serie storiche",
+              "rendimento medio",
+              "previsione",
+              "affidabilità dei dati",
+            ],
+          },
+          {
+            id: "perche-retrospettivo",
+            q: "Perché «retrospettivo» e non una proiezione futura?",
+            a: "Guardare al passato rende il costo delle piccole spese più concreto: «quanto si avrebbe già oggi» colpisce più di una promessa sul futuro. È un cambio di prospettiva, non uno strumento di investimento: SeSolo non indica cosa fare in futuro, né quale strumento scegliere.",
+            keywords: [
+              "retrospettivo",
+              "perché guardare al passato",
+              "proiezione futura",
+              "previsione futura",
+              "cambio di prospettiva",
+            ],
+          },
+        ],
       },
       {
-        q: "Come viene calcolato il risultato?",
-        a: "Il capitale iniziale e ogni versamento vengono fatti crescere mese per mese secondo l'andamento storico reale dello strumento scelto (dati di mercato effettivi, non un tasso ipotetico fisso uguale per tutti gli strumenti). Al valore finale si sottrae l'eventuale tassazione sui guadagni.",
+        title: "Gli strumenti e i dati storici",
+        items: [
+          {
+            id: "strumenti-disponibili",
+            q: "Quali strumenti posso scegliere e cosa rappresentano?",
+            a: "Cinque strumenti, ognuno basato su una serie storica reale: «Azionario globale» (indice MSCI World, mercati sviluppati in oltre 20 paesi), «Titoli di Stato (10 anni)» (titoli di Stato statunitensi a 10 anni), «Bilanciato 60/40» (un mix simulato: 60% azionario globale più 40% titoli di Stato a 10 anni), «Bitcoin» (prezzo storico spot) e «Libretto postale» (un tasso di riferimento storico usato come proxy, spiegato nella domanda successiva).",
+            keywords: [
+              "quali strumenti",
+              "azioni",
+              "borsa",
+              "mercato azionario",
+              "MSCI World",
+              "titoli di stato",
+              "obbligazioni",
+              "bilanciato 60/40",
+              "bitcoin",
+              "cripto",
+              "criptovaluta",
+              "crypto",
+              "libretto postale",
+              "libretto di risparmio",
+            ],
+          },
+          {
+            id: "libretto-postale-proxy",
+            q: "«Libretto postale» è davvero il libretto di risparmio postale?",
+            a: "No, ed è importante saperlo: per questo strumento non esiste una serie storica pubblica del rendimento reale del libretto postale. Il dato usato è invece la media storica dei rendimenti dei Buoni Ordinari del Tesoro (BOT), pubblicata da Banca d'Italia, presa come proxy, cioè come approssimazione ragionevole di uno strumento a basso rischio e basso rendimento. La tassazione reale del libretto postale segue regole proprie, diverse da quelle applicate qui: il risultato mostrato è quindi illustrativo, non un calcolo preciso di quanto avrebbe reso un libretto postale reale.",
+            keywords: [
+              "BOT",
+              "buoni ordinari del tesoro",
+              "buoni italiani",
+              "buoni del tesoro",
+              "titoli di stato a breve termine",
+              "libretto postale",
+              "libretto di risparmio",
+            ],
+          },
+          {
+            id: "titoli-stato-usa",
+            q: "Perché «Titoli di Stato (10 anni)» usa dati statunitensi?",
+            a: "Un indice obbligazionario globale ampiamente diversificato (come quello che replicano molti fondi reali) è un dato proprietario, senza una fonte pubblica gratuita disponibile. Il titolo di Stato USA a 10 anni ha invece una serie storica pubblica e lunga, ed è un riferimento comune per rappresentare l'andamento di questa categoria di strumenti. Per questo l'etichetta indica esplicitamente «Titoli di Stato (10 anni)» e non «obbligazionario globale».",
+            keywords: [
+              "obbligazioni",
+              "titoli di stato",
+              "BTP",
+              "bond",
+              "titoli di stato americani",
+              "treasury",
+              "obbligazionario globale",
+            ],
+          },
+          {
+            id: "bitcoin-volatilita",
+            q: "Perché i risultati con Bitcoin possono sembrare estremi?",
+            a: "Il prezzo storico di Bitcoin ha attraversato fasi di crescita molto rapida e fasi di calo altrettanto marcato: è lo strumento con le oscillazioni più ampie tra quelli disponibili. Scegliendo periodi diversi, anche di poco, il risultato può cambiare in modo molto vistoso. Questo non indica un errore di calcolo: riflette la reale variabilità storica di questo strumento, e va letto tenendo conto che un periodo passato non garantisce lo stesso comportamento in futuro.",
+            keywords: [
+              "cripto",
+              "criptovaluta",
+              "crypto",
+              "bitcoin",
+              "volatilità",
+              "oscillazioni",
+              "risultati estremi",
+            ],
+          },
+          {
+            id: "periodo-dati-disponibili",
+            q: "Che periodo coprono i dati storici?",
+            a: "Ogni strumento ha una copertura diversa, perché deriva da una fonte diversa: l'azionario globale parte dal 1985, titoli di Stato e bilanciato 60/40 dal 1928, Bitcoin dal 2010 e il proxy del libretto postale dal 1981. Se si sceglie una data di inizio o fine fuori da questo intervallo, SeSolo non inventa né estrapola un dato: la finestra viene automaticamente riportata (in gergo tecnico, «troncata») al periodo effettivamente disponibile per lo strumento scelto, e compare un avviso («Nota sui dati usati») che lo segnala in modo esplicito.",
+            keywords: [
+              "copertura dati",
+              "periodo storico",
+              "date disponibili",
+              "range di date",
+              "dati mancanti",
+              "troncamento",
+            ],
+          },
+          {
+            id: "tassazione-aliquote",
+            q: "Come funziona la tassazione nella simulazione?",
+            a: "L'imposta si applica solo al guadagno, mai al capitale versato: se il risultato è in perdita, non viene calcolata alcuna imposta. Il campo «Tassazione finale» propone come punto di partenza l'aliquota standard italiana sulle rendite finanziarie, il 26%, modificabile liberamente; per i titoli di Stato la normativa italiana prevede un'aliquota ridotta, il 12,5%. Questi valori sono un riferimento informativo per capire l'effetto delle imposte sul risultato, non un'indicazione su quale strumento scegliere per motivi fiscali.",
+            keywords: [
+              "tasse",
+              "imposte",
+              "plusvalenza",
+              "26%",
+              "12,5%",
+              "aliquota",
+              "tassazione sui guadagni",
+            ],
+          },
+        ],
       },
       {
-        q: "Cosa cambia con inflazione e tassazione?",
-        a: "Se attivi «Tieni conto dell'inflazione», i valori vengono espressi in termini reali, cioè a parità di potere d'acquisto con oggi. La «Tassazione finale» applica l'aliquota selezionata (la percentuale di imposta) ai soli guadagni: il risultato mostra il valore al netto delle imposte.",
+        title: "Dati e privacy",
+        items: [
+          {
+            id: "dati-al-sicuro",
+            q: "I miei dati sono al sicuro?",
+            a: "Sì: SeSolo non fa alcuna chiamata di rete verso l'esterno. Gli scenari salvati restano esclusivamente nella memoria locale del browser (localStorage) e non lasciano mai il dispositivo usato.",
+            keywords: [
+              "dati personali",
+              "localStorage",
+              "sicurezza",
+              "privacy",
+              "chiamate di rete",
+              "dati al sicuro",
+            ],
+          },
+          {
+            id: "scenari-salvati",
+            q: "Dove ritrovo gli scenari salvati?",
+            a: "Nella sezione Storico. Da lì è possibile riaprirli nel simulatore per modificarli oppure eliminarli.",
+            keywords: [
+              "scenari salvati",
+              "storico",
+              "dove trovo i miei scenari",
+              "cronologia simulazioni",
+            ],
+          },
+          {
+            id: "scenario-strumento-rimosso",
+            q: "Cosa succede se riapro uno scenario che usa uno strumento non più disponibile?",
+            a: "Se in futuro un aggiornamento di SeSolo modifica gli strumenti disponibili, uno scenario salvato in precedenza continua ad aprirsi correttamente: SeSolo non genera un errore né una pagina vuota, ma segnala la situazione in modo esplicito e propone un'alternativa ragionevole, così da poter comunque consultare o correggere lo scenario.",
+            keywords: [
+              "strumento rimosso",
+              "scenario non funziona più",
+              "errore apertura scenario",
+              "strumento non disponibile",
+            ],
+          },
+        ],
       },
       {
-        q: "Il rendimento è realistico?",
-        a: "I calcoli usano serie storiche reali (indici azionari, titoli di Stato, Bitcoin, tassi di riferimento) per il periodo che scegli, non un rendimento medio inventato: per questo il risultato cambia a seconda della finestra temporale selezionata, proprio come sarebbe successo davvero. Restano comunque dati passati: i mercati reali non offrono rendimenti garantiti, e i risultati non sono una previsione né un consiglio finanziario.",
-      },
-      {
-        q: "I miei dati sono al sicuro?",
-        a: "Sì: SeSolo non fa alcuna chiamata di rete. Gli scenari che salvi restano esclusivamente nella memoria locale del tuo browser (localStorage) e non lasciano mai il tuo dispositivo.",
-      },
-      {
-        q: "Dove ritrovo gli scenari salvati?",
-        a: "Nella sezione Storico. Da lì puoi riaprirli nel simulatore per modificarli oppure eliminarli.",
-      },
-      {
-        q: "Perché «retrospettivo» e non una proiezione futura?",
-        a: "Guardare al passato rende il costo delle piccole spese più concreto: «quanto avrei già oggi» colpisce più di una promessa sul futuro. È un cambio di prospettiva, non uno strumento di investimento.",
+        title: "Cosa non è SeSolo",
+        items: [
+          {
+            id: "consiglio-investimento",
+            q: "SeSolo mi dice cosa conviene fare?",
+            a: "No. SeSolo è uno strumento illustrativo che mostra, a partire da dati storici reali, quanto si sarebbe accumulato in un periodo passato con una determinata scelta. Non indica quale strumento scegliere, non consiglia di comprare o vendere nulla e non sostituisce una consulenza finanziaria personalizzata. Ogni risultato va letto come «ecco cosa sarebbe successo con questi dati storici», non come una previsione o un suggerimento su cosa fare.",
+            keywords: [
+              "consiglio di investimento",
+              "consulenza finanziaria",
+              "cosa conviene fare",
+              "suggerimento di investimento",
+              "disclaimer",
+            ],
+          },
+        ],
       },
     ],
+    search: {
+      label: "Cerca nelle domande frequenti",
+      placeholder: "Cerca una domanda, ad esempio «buoni italiani»…",
+      resultCount: (n: number) =>
+        n === 1 ? "1 risultato trovato." : `${n} risultati trovati.`,
+      noResults: "Nessun risultato.",
+    },
+    noResultsForQuery: (query: string) =>
+      `Nessun risultato per «${query}». Prova con altre parole, magari più generiche o un sinonimo.`,
     ctaTitle: "Inizia una simulazione",
     ctaBody: "Bastano un importo e un periodo per vedere l'effetto del tempo.",
     ctaButton: "Vai al simulatore",
@@ -348,6 +550,7 @@ const it = {
       "Seleziona uno strumento per vedere una spiegazione di cosa rappresenta il dato storico usato.",
     disclaimer:
       "Dati storici a scopo illustrativo: nessun consiglio di investimento, nessuna raccomandazione su cosa scegliere, comprare o vendere.",
+    faqLink: "Scopri di più nelle FAQ",
     descriptions: {
       globalEquity:
         "Rappresenta l'andamento storico dell'indice azionario globale MSCI World (mercati sviluppati, migliaia di aziende in oltre 20 paesi). Storicamente il rendimento più alto nel lungo periodo, ma anche le oscillazioni più marcate nel breve.",
@@ -600,37 +803,237 @@ const en: Dict = {
   faq: {
     title: "Frequently asked questions",
     subtitle:
-      "How SeSolo works, where the return comes from and what happens to your data.",
-    items: [
+      "How SeSolo works, where the historical data used for each instrument comes from, and what happens to the data you enter.",
+    groups: [
       {
-        q: "What is SeSolo?",
-        a: "It's a retrospective savings simulator. It takes an initial capital and a recurring expense and shows how much you would have today if, instead of spending them, you had invested them in the chosen instrument.",
+        title: "General",
+        items: [
+          {
+            id: "cosa-e-hagenton",
+            q: "What is SeSolo?",
+            a: "It's a retrospective savings simulator. It takes an initial capital and a recurring expense and shows how much would have been accumulated today if, instead of being spent, it had been invested in the chosen instrument.",
+            keywords: [
+              "sesolo",
+              "what is sesolo",
+              "what is this app for",
+              "savings simulator",
+              "how the app works",
+            ],
+          },
+          {
+            id: "come-viene-calcolato",
+            q: "How is the result calculated?",
+            a: "The initial capital and every contribution grow month by month following the real historical performance of the chosen instrument (actual market data, not a fixed hypothetical rate applied equally to every instrument). Any taxation on gains is subtracted from the final value.",
+            keywords: [
+              "how the calculation works",
+              "formula",
+              "calculation method",
+              "how the result is calculated",
+              "market data",
+              "historical performance",
+            ],
+          },
+          {
+            id: "inflazione-e-tassazione",
+            q: "What changes with inflation and taxation?",
+            a: "Turning on “Account for inflation” expresses the values in real terms: at the same purchasing power as today, that is net of the loss of value of money over time. With inflation switched off, values stay in nominal terms, i.e. the actual amounts of each year, without this adjustment. “Final taxation” applies the chosen rate to gains only, never to the capital paid in: the result shows the after-tax value.",
+            keywords: [
+              "inflation",
+              "taxation",
+              "purchasing power",
+              "real values",
+              "nominal values",
+              "tax on gains",
+            ],
+          },
+          {
+            id: "rendimento-realistico",
+            q: "Is the return realistic?",
+            a: "The calculations use real historical series (equity indices, government bonds, Bitcoin, reference rates) for the chosen period, not a made-up average return: that's why the result changes depending on the selected time window, exactly as it would have really happened. It is still past data: real markets offer no guaranteed returns, and the results are neither a forecast nor financial advice.",
+            keywords: [
+              "realistic return",
+              "real data",
+              "historical series",
+              "average return",
+              "forecast",
+              "data reliability",
+            ],
+          },
+          {
+            id: "perche-retrospettivo",
+            q: "Why “retrospective” and not a future projection?",
+            a: "Looking to the past makes the cost of small expenses more concrete: “how much I'd already have today” hits harder than a promise about the future. It's a change of perspective, not an investment tool: SeSolo does not indicate what to do in future, nor which instrument to choose.",
+            keywords: [
+              "retrospective",
+              "why look at the past",
+              "future projection",
+              "future forecast",
+              "change of perspective",
+            ],
+          },
+        ],
       },
       {
-        q: "How is the result calculated?",
-        a: "The initial capital and every contribution grow month by month following the real historical performance of the chosen instrument (actual market data, not a fixed hypothetical rate applied equally to every instrument). Any taxation on gains is subtracted from the final value.",
+        title: "Instruments and historical data",
+        items: [
+          {
+            id: "strumenti-disponibili",
+            q: "Which instruments can I choose and what do they represent?",
+            a: "Five instruments, each based on a real historical series: “Global equity” (MSCI World index, developed markets across more than 20 countries), “Government bonds (10y)” (10-year US government bonds), “Balanced 60/40” (a simulated mix: 60% global equity plus 40% 10-year government bonds), “Bitcoin” (historical spot price) and “Postal savings” (a historical reference rate used as a proxy, explained in the next question).",
+            keywords: [
+              "which instruments",
+              "stocks",
+              "stock market",
+              "equity market",
+              "MSCI World",
+              "government bonds",
+              "bonds",
+              "balanced 60/40",
+              "bitcoin",
+              "crypto",
+              "cryptocurrency",
+              "postal savings",
+              "postal savings book",
+            ],
+          },
+          {
+            id: "libretto-postale-proxy",
+            q: "Is “Postal savings” really the Italian postal savings book?",
+            a: "No, and it's important to know this: no public historical series exists for the real return of the Italian postal savings book. The figure used instead is the historical average return of Italian Treasury bills (BOT), published by the Bank of Italy, taken as a proxy — a reasonable approximation of a low-risk, low-return instrument. The real taxation of postal savings follows its own rules, different from the ones applied here: the result shown is therefore illustrative, not a precise calculation of what a real postal savings book would have earned.",
+            keywords: [
+              "BOT",
+              "Italian Treasury bills",
+              "T-bills",
+              "Italian government bonds",
+              "short-term government bonds",
+              "postal savings",
+              "postal savings book",
+              "postal savings account",
+            ],
+          },
+          {
+            id: "titoli-stato-usa",
+            q: "Why does “Government bonds (10y)” use US data?",
+            a: "A broadly diversified global bond index — the kind many real funds replicate — is proprietary data, with no free public source available. The 10-year US government bond, on the other hand, has a long public historical series and is a common reference for this category of instruments. That is why the label explicitly reads “Government bonds (10y)” rather than “global bonds”.",
+            keywords: [
+              "bonds",
+              "government bonds",
+              "BTP",
+              "bond",
+              "US government bonds",
+              "treasury",
+              "global bond index",
+            ],
+          },
+          {
+            id: "bitcoin-volatilita",
+            q: "Why can results with Bitcoin look extreme?",
+            a: "Bitcoin's historical price has gone through phases of very rapid growth and equally sharp declines: it is the instrument with the widest swings among those available. Choosing different periods, even by a little, can change the result quite dramatically. This does not indicate a calculation error: it reflects the real historical variability of this instrument, and should be read bearing in mind that a past period does not guarantee the same behaviour in future.",
+            keywords: [
+              "crypto",
+              "cryptocurrency",
+              "bitcoin",
+              "volatility",
+              "swings",
+              "extreme results",
+            ],
+          },
+          {
+            id: "periodo-dati-disponibili",
+            q: "What period does the historical data cover?",
+            a: "Each instrument has different coverage, because it comes from a different source: global equity starts in 1985, government bonds and the balanced 60/40 mix in 1928, Bitcoin in 2010, and the postal savings proxy in 1981. If you choose a start or end date outside this range, SeSolo does not invent or extrapolate a figure: the window is automatically brought back (in technical terms, “clamped”) to the period actually available for the chosen instrument, and a notice (“Note on the data used”) appears to flag this explicitly.",
+            keywords: [
+              "data coverage",
+              "historical period",
+              "available dates",
+              "date range",
+              "missing data",
+              "clamping",
+            ],
+          },
+          {
+            id: "tassazione-aliquote",
+            q: "How does taxation work in the simulation?",
+            a: "Tax applies only to the gain, never to the capital paid in: if the result is a loss, no tax is calculated. The “Final taxation” field proposes, as a starting point, the standard Italian rate on financial income, 26%, freely editable; for government bonds, Italian law provides for a reduced rate of 12.5%. These figures are an informative reference to understand the effect of taxes on the result, not an indication of which instrument to choose for tax reasons.",
+            keywords: [
+              "taxes",
+              "tax",
+              "capital gain",
+              "26%",
+              "12.5%",
+              "tax rate",
+              "tax on gains",
+            ],
+          },
+        ],
       },
       {
-        q: "What changes with inflation and taxation?",
-        a: "If you enable “Account for inflation”, values are expressed in real terms, i.e. at the same purchasing power as today. “Final taxation” applies the selected rate (the tax percentage) to gains only: the result shows the after-tax value.",
+        title: "Data and privacy",
+        items: [
+          {
+            id: "dati-al-sicuro",
+            q: "Is my data safe?",
+            a: "Yes: SeSolo makes no network calls of any kind. Saved scenarios stay exclusively in the browser's local storage (localStorage) and never leave the device used.",
+            keywords: [
+              "personal data",
+              "localStorage",
+              "security",
+              "privacy",
+              "network calls",
+              "data safety",
+            ],
+          },
+          {
+            id: "scenari-salvati",
+            q: "Where do I find my saved scenarios?",
+            a: "In the History section. From there you can reopen them in the simulator to edit them, or delete them.",
+            keywords: [
+              "saved scenarios",
+              "history",
+              "where are my scenarios",
+              "simulation history",
+            ],
+          },
+          {
+            id: "scenario-strumento-rimosso",
+            q: "What happens if I reopen a scenario that uses an instrument no longer available?",
+            a: "If a future SeSolo update changes the available instruments, a previously saved scenario still opens correctly: SeSolo does not throw an error or show a blank page, but flags the situation explicitly and proposes a reasonable alternative, so the scenario can still be viewed or corrected.",
+            keywords: [
+              "instrument removed",
+              "scenario no longer works",
+              "error opening scenario",
+              "instrument unavailable",
+            ],
+          },
+        ],
       },
       {
-        q: "Is the return realistic?",
-        a: "The calculations use real historical series (equity indices, government bonds, Bitcoin, reference rates) for the period you choose, not a made-up average return: that's why the result changes depending on the selected time window, exactly as it would have really happened. It is still past data: real markets offer no guaranteed returns, and the results are neither a forecast nor financial advice.",
-      },
-      {
-        q: "Is my data safe?",
-        a: "Yes: SeSolo makes no network calls. The scenarios you save stay exclusively in your browser's local storage (localStorage) and never leave your device.",
-      },
-      {
-        q: "Where do I find the saved scenarios?",
-        a: "In the History section. From there you can reopen them in the simulator to edit them or delete them.",
-      },
-      {
-        q: "Why “retrospective” and not a future projection?",
-        a: "Looking to the past makes the cost of small expenses more concrete: “how much I'd already have today” hits harder than a promise about the future. It's a change of perspective, not an investment tool.",
+        title: "What SeSolo is not",
+        items: [
+          {
+            id: "consiglio-investimento",
+            q: "Does SeSolo tell me what I should do?",
+            a: "No. SeSolo is an illustrative tool that shows, based on real historical data, how much would have been accumulated over a past period with a given choice. It does not indicate which instrument to choose, does not recommend buying or selling anything, and does not replace personalised financial advice. Every result should be read as “here is what would have happened with this historical data”, not as a forecast or a suggestion about what to do.",
+            keywords: [
+              "investment advice",
+              "financial advice",
+              "what should I do",
+              "investment suggestion",
+              "disclaimer",
+            ],
+          },
+        ],
       },
     ],
+    search: {
+      label: "Search the frequently asked questions",
+      placeholder: "Search a question, e.g. “Italian government bonds”…",
+      resultCount: (n: number) =>
+        n === 1 ? "1 result found." : `${n} results found.`,
+      noResults: "No results.",
+    },
+    noResultsForQuery: (query: string) =>
+      `No results for “${query}”. Try other words, perhaps more general or a synonym.`,
     ctaTitle: "Start a simulation",
     ctaBody: "An amount and a period are all it takes to see the effect of time.",
     ctaButton: "Go to the simulator",
@@ -685,6 +1088,7 @@ const en: Dict = {
       "Select an instrument to see an explanation of what the historical data used represents.",
     disclaimer:
       "Historical data for illustrative purposes: no investment advice, no recommendation on what to choose, buy or sell.",
+    faqLink: "Learn more in the FAQ",
     descriptions: {
       globalEquity:
         "Represents the historical performance of the MSCI World global equity index (developed markets, thousands of companies across more than 20 countries). Historically the highest return over the long run, but also the sharpest swings in the short term.",

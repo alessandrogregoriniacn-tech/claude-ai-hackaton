@@ -1,10 +1,27 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { InstrumentKey } from "@/lib/constants";
 import { useI18n } from "./I18nProvider";
 
 const PANEL_ID = "instrument-info-panel";
+
+/**
+ * Per-strumento, la voce delle FAQ (`apps/web/lib/i18n/dictionaries.ts`,
+ * `faq.groups`) che approfondisce il dato storico usato. Gli id sono stabili
+ * tra le lingue, quindi il link funziona indipendentemente dalla lingua
+ * selezionata. Dove non esiste una domanda dedicata (azionario globale,
+ * bilanciato 60/40), si rimanda alla domanda generale sugli strumenti
+ * disponibili: sempre meglio di un link generico alla pagina.
+ */
+const INSTRUMENT_FAQ_ANCHOR: Record<InstrumentKey, string> = {
+  globalEquity: "strumenti-disponibili",
+  govBonds10y: "titoli-stato-usa",
+  balanced6040: "strumenti-disponibili",
+  bitcoin: "bitcoin-volatilita",
+  postalSavings: "libretto-postale-proxy",
+};
 
 interface InstrumentInfoPopoverProps {
   instrument: InstrumentKey | "";
@@ -58,6 +75,10 @@ export function InstrumentInfoPopover({ instrument }: InstrumentInfoPopoverProps
     ? t.instrumentInfo.triggerSelected(instrumentLabel)
     : t.instrumentInfo.triggerEmpty;
 
+  const faqHref = instrument
+    ? `/faq#${INSTRUMENT_FAQ_ANCHOR[instrument]}`
+    : "/faq#strumenti-disponibili";
+
   return (
     <span className="relative inline-flex">
       {/* Icona piccola e leggera: l'area di tocco resta 44px (min-h-11/min-w-11)
@@ -93,6 +114,12 @@ export function InstrumentInfoPopover({ instrument }: InstrumentInfoPopoverProps
           <p className="mt-3 border-t border-border pt-2 text-xs text-muted">
             {t.instrumentInfo.disclaimer}
           </p>
+          <Link
+            href={faqHref}
+            className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-foreground underline underline-offset-2 hover:opacity-80"
+          >
+            {t.instrumentInfo.faqLink}
+          </Link>
         </div>
       ) : null}
     </span>
