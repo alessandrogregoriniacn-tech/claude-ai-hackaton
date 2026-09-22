@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * DESIGN TOKENS (placeholder)
+ * Questi valori verranno sostituiti dai token del design system interno.
+ * I componenti usano esclusivamente queste variabili via Tailwind (bg-background,
+ * text-foreground, ecc.), quindi il restyle sarà centralizzato qui.
+ */
+:root {
+  --color-background: #0b0f19;
+  --color-foreground: #f5f7fa;
+  --color-surface: #151b2b;
+  --color-border: #26304a;
+  --color-muted: #8b93a7;
+  --color-primary: #4f7cff;
+  --color-primary-foreground: #ffffff;
+  --color-accent: #17c964;
+  --color-accent-foreground: #04160b;
+  --color-positive: #17c964;
+  --color-negative: #f31260;
+
+  --radius-card: 16px;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
