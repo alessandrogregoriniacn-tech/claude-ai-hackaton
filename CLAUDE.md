@@ -77,8 +77,7 @@ presentation/   → materiale per la demo finale
 ## UX/UI Guidelines
 
 - **CTA standard**: disabilitato finché il form non è valido, validazione inline
-  sui singoli campi. (Non usiamo la convenzione "mai disabilitare i bottoni" di
-  alcuni design system bancari — qui va bene il pattern classico.)
+  sui singoli campi.
 - Ogni interazione utente deve portare a uno stato valido: mai una pagina bianca o
   un crash React per una combinazione di input, anche assurda.
 - Palette, token, accessibilità (contrasto AA, focus, touch target ≥44px): vedi
