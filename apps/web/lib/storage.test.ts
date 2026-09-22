@@ -17,7 +17,7 @@ function makeScenario(over: Partial<Scenario> = {}): Scenario {
     periodicity: "1m",
     startDate: "2010-01-01",
     endDate: "2020-01-01",
-    instrument: "azionaria",
+    instrument: "globalEquity",
     adjustForInflation: false,
     taxRate: 26,
     createdAt: "2020-01-01T00:00:00.000Z",
@@ -117,7 +117,7 @@ describe("updateScenario", () => {
       periodicity: "1m" as const,
       startDate: "2010-01-01",
       endDate: "2011-01-01",
-      instrument: "azionaria" as const,
+      instrument: "globalEquity" as const,
       adjustForInflation: false,
       taxRate: 26,
     };

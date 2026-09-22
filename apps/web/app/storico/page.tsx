@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { simulate, type Instrument, type Periodicity } from "@/lib/finance";
+import { simulate, type Periodicity } from "@/lib/finance";
+import { INSTRUMENT_LABELS, type InstrumentKey } from "@/lib/constants";
 import { formatCurrency } from "@/lib/format";
 import { loadScenarios, saveScenarios, type Scenario } from "@/lib/storage";
+import { WarningBanner } from "@/components/WarningBanner";
 
 const PERIODICITY_LABELS: Record<Periodicity, string> = {
   "1w": "ogni settimana",
@@ -15,11 +17,15 @@ const PERIODICITY_LABELS: Record<Periodicity, string> = {
   "12m": "ogni 12 mesi",
 };
 
-const INSTRUMENT_LABELS: Record<Instrument, string> = {
-  azionaria: "Azionaria",
-  obbligazionaria: "Obbligazionaria",
-  bitcoin: "Bitcoin",
-};
+/**
+ * Etichetta di uno scenario salvato: la chiave persistita in localStorage può
+ * non esistere più (dataset aggiornato dopo il salvataggio) — mai un crash o
+ * una label vuota, il motore la gestisce con `unknownInstrumentFallback` ma la
+ * UI deve comunque restare onesta su quale strumento non è più disponibile.
+ */
+function instrumentLabelFor(instrument: InstrumentKey): string | null {
+  return INSTRUMENT_LABELS[instrument] ?? null;
+}
 
 export default function StoricoPage() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -94,43 +100,57 @@ export default function StoricoPage() {
               adjustForInflation: s.adjustForInflation,
               taxRate: s.taxRate,
             });
+            const instrumentLabel = instrumentLabelFor(s.instrument);
             return (
               <li
                 key={s.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-border bg-surface px-4 py-3"
+                className="rounded-card border border-border bg-surface px-4 py-3"
               >
-                <div>
-                  <p className="font-medium">{s.label}</p>
-                  <p className="text-sm text-muted">
-                    {INSTRUMENT_LABELS[s.instrument]} ·{" "}
-                    {formatCurrency(s.periodicAmount, true)}{" "}
-                    {PERIODICITY_LABELS[s.periodicity]} · dal{" "}
-                    {new Date(`${s.startDate}T00:00:00`).toLocaleDateString(
-                      "it-IT",
-                    )}{" "}
-                    al{" "}
-                    {new Date(`${s.endDate}T00:00:00`).toLocaleDateString(
-                      "it-IT",
-                    )}
-                  </p>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="font-medium">{s.label}</p>
+                    <p className="text-sm text-muted">
+                      {instrumentLabel ?? (
+                        <span className="inline-flex items-center gap-1 text-negative">
+                          <span aria-hidden="true">⚠</span>
+                          Strumento non più disponibile
+                        </span>
+                      )}{" "}
+                      · {formatCurrency(s.periodicAmount, true)}{" "}
+                      {PERIODICITY_LABELS[s.periodicity]} · dal{" "}
+                      {new Date(`${s.startDate}T00:00:00`).toLocaleDateString(
+                        "it-IT",
+                      )}{" "}
+                      al{" "}
+                      {new Date(`${s.endDate}T00:00:00`).toLocaleDateString(
+                        "it-IT",
+                      )}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="font-semibold tabular-nums text-foreground">
+                      {formatCurrency(r.finalValue)}
+                    </span>
+                    <Link
+                      href={`/simulazione?load=${s.id}`}
+                      className="inline-flex min-h-11 items-center rounded-pill border-2 border-foreground px-4 text-sm font-semibold text-foreground transition hover:bg-foreground/10 active:opacity-80"
+                    >
+                      Apri
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(s.id)}
+                      className="-m-2 inline-flex min-h-11 items-center p-2 text-sm font-medium text-negative underline-offset-2 hover:underline"
+                    >
+                      Elimina
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="font-semibold tabular-nums text-foreground">
-                    {formatCurrency(r.finalValue)}
-                  </span>
-                  <Link
-                    href={`/simulazione?load=${s.id}`}
-                    className="inline-flex min-h-11 items-center rounded-pill border-2 border-foreground px-4 text-sm font-semibold text-foreground transition hover:bg-foreground/10 active:opacity-80"
-                  >
-                    Apri
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(s.id)}
-                    className="-m-2 inline-flex min-h-11 items-center p-2 text-sm font-medium text-negative underline-offset-2 hover:underline"
-                  >
-                    Elimina
-                  </button>
-                </div>
+
+                {r.warnings.length > 0 ? (
+                  <div className="mt-3">
+                    <WarningBanner warnings={r.warnings} compact />
+                  </div>
+                ) : null}
               </li>
             );
           })}

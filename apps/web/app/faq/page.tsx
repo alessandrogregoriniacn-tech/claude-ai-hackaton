@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { INSTRUMENT_RETURNS } from "@/lib/constants";
-import { formatPercent } from "@/lib/format";
 
 const FAQS = [
   {
@@ -9,13 +7,7 @@ const FAQS = [
   },
   {
     q: "Come viene calcolato il risultato?",
-    a: `Il capitale iniziale e ogni versamento crescono mese per mese con capitalizzazione mensile (ogni mese i guadagni si sommano al capitale e producono a loro volta rendimento nei mesi successivi), secondo il tasso annuo ipotetico dello strumento scelto: Azionaria ${formatPercent(
-      INSTRUMENT_RETURNS.azionaria,
-    )}, Obbligazionaria ${formatPercent(
-      INSTRUMENT_RETURNS.obbligazionaria,
-    )}, Bitcoin ${formatPercent(
-      INSTRUMENT_RETURNS.bitcoin,
-    )}. All'importo finale si sottrae l'eventuale tassazione sui guadagni.`,
+    a: "Il capitale iniziale e ogni versamento vengono fatti crescere mese per mese secondo l'andamento storico reale dello strumento scelto (dati di mercato effettivi, non un tasso ipotetico fisso uguale per tutti gli strumenti). Al valore finale si sottrae l'eventuale tassazione sui guadagni.",
   },
   {
     q: "Cosa cambia con inflazione e tassazione?",
@@ -23,7 +15,7 @@ const FAQS = [
   },
   {
     q: "Il rendimento è realistico?",
-    a: "Sono ipotesi illustrative e costanti, utili per rendere tangibile l'effetto del tempo. I mercati reali non offrono rendimenti fissi e garantiti: i risultati non sono una previsione né un consiglio finanziario.",
+    a: "I calcoli usano serie storiche reali (indici azionari, titoli di Stato, Bitcoin, tassi di riferimento) per il periodo che scegli, non un rendimento medio inventato: per questo il risultato cambia a seconda della finestra temporale selezionata, proprio come sarebbe successo davvero. Restano comunque dati passati: i mercati reali non offrono rendimenti garantiti, e i risultati non sono una previsione né un consiglio finanziario.",
   },
   {
     q: "I miei dati sono al sicuro?",
