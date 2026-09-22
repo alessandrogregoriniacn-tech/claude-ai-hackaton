@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { InstrumentKey } from "@/lib/constants";
 
@@ -22,6 +23,20 @@ const INSTRUMENT_INFO: Record<InstrumentKey, string> = {
 };
 
 const PANEL_ID = "instrument-info-panel";
+
+/**
+ * Per-strumento, la voce delle FAQ che approfondisce il dato storico usato.
+ * Dove non esiste una domanda dedicata (azionario globale, bilanciato 60/40),
+ * si rimanda alla domanda generale sugli strumenti disponibili: sempre meglio
+ * di un link generico alla pagina.
+ */
+const INSTRUMENT_FAQ_ANCHOR: Record<InstrumentKey, string> = {
+  globalEquity: "strumenti-disponibili",
+  govBonds10y: "titoli-stato-usa",
+  balanced6040: "strumenti-disponibili",
+  bitcoin: "bitcoin-volatilita",
+  postalSavings: "libretto-postale-proxy",
+};
 
 interface InstrumentInfoPopoverProps {
   instrument: InstrumentKey | "";
@@ -76,6 +91,10 @@ export function InstrumentInfoPopover({
     ? `Cosa rappresenta lo strumento «${instrumentLabel}»`
     : "Cosa rappresentano gli strumenti disponibili";
 
+  const faqHref = instrument
+    ? `/faq#${INSTRUMENT_FAQ_ANCHOR[instrument]}`
+    : "/faq#strumenti-disponibili";
+
   return (
     <span className="relative inline-flex">
       {/* Icona piccola e leggera: l'area di tocco resta 44px (min-h-11/min-w-11)
@@ -112,6 +131,12 @@ export function InstrumentInfoPopover({
             Dati storici a scopo illustrativo: nessun consiglio di investimento,
             nessuna raccomandazione su cosa scegliere, comprare o vendere.
           </p>
+          <Link
+            href={faqHref}
+            className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-foreground underline underline-offset-2 hover:opacity-80"
+          >
+            Scopri di più nelle FAQ
+          </Link>
         </div>
       ) : null}
     </span>
