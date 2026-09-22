@@ -90,19 +90,30 @@ export function simulate(input: SimulationInput): SimulationResult {
   const end = new Date(`${input.endDate}T00:00:00`);
   const months = monthsBetween(start, end);
 
-  const nominalAnnual = INSTRUMENT_RETURNS[input.instrument];
+  // Guard: unknown instrument key (e.g. legacy scenario after a rename) falls
+  // back to 0% annual return — no growth, no NaN, no exception to the UI.
+  const nominalAnnual: number =
+    Object.prototype.hasOwnProperty.call(INSTRUMENT_RETURNS, input.instrument) &&
+    typeof (INSTRUMENT_RETURNS as Record<string, unknown>)[input.instrument] === "number"
+      ? INSTRUMENT_RETURNS[input.instrument]
+      : 0;
+
   // In termini reali il rendimento è "sgonfiato" dall'inflazione.
   const annualRate = input.adjustForInflation
     ? (1 + nominalAnnual) / (1 + INFLATION_RATE) - 1
     : nominalAnnual;
 
   const monthlyRate = monthlyRateFromAnnual(annualRate);
+  // Negative periodicAmount is clamped to 0: withdrawals are not modelled.
   const monthlyContribution =
-    input.periodicAmount * PAYMENTS_PER_MONTH[input.periodicity];
+    Math.max(0, input.periodicAmount) * PAYMENTS_PER_MONTH[input.periodicity];
+
+  // Negative initialCapital is clamped to 0: capital cannot be negative.
+  const safeInitial = Math.max(0, input.initialCapital);
 
   const points: MonthlyPoint[] = [];
-  let value = input.initialCapital;
-  let contributed = input.initialCapital;
+  let value = safeInitial;
+  let contributed = safeInitial;
 
   const cursor = new Date(start.getFullYear(), start.getMonth(), 1);
 
@@ -131,7 +142,8 @@ export function simulate(input: SimulationInput): SimulationResult {
   const grossFinalValue = round2(value);
   const totalInvested = round2(contributed);
   const grossGain = grossFinalValue - totalInvested;
-  const taxRate = Math.max(0, input.taxRate) / 100;
+  // taxRate is clamped to [0, 100] so taxPaid never exceeds grossGain.
+  const taxRate = Math.min(100, Math.max(0, input.taxRate)) / 100;
   const taxPaid = round2(grossGain > 0 ? grossGain * taxRate : 0);
   const finalValue = round2(grossFinalValue - taxPaid);
 

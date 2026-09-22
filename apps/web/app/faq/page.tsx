@@ -9,17 +9,17 @@ const FAQS = [
   },
   {
     q: "Come viene calcolato il risultato?",
-    a: `Il capitale iniziale e ogni versamento vengono fatti crescere mese per mese con capitalizzazione mensile, secondo il rendimento annuo dello strumento scelto: Azionaria ${formatPercent(
+    a: `Il capitale iniziale e ogni versamento crescono mese per mese con capitalizzazione mensile (ogni mese i guadagni si sommano al capitale e producono a loro volta rendimento nei mesi successivi), secondo il tasso annuo ipotetico dello strumento scelto: Azionaria ${formatPercent(
       INSTRUMENT_RETURNS.azionaria,
     )}, Obbligazionaria ${formatPercent(
       INSTRUMENT_RETURNS.obbligazionaria,
     )}, Bitcoin ${formatPercent(
       INSTRUMENT_RETURNS.bitcoin,
-    )}. Al valore finale si sottrae l'eventuale tassazione sui guadagni.`,
+    )}. All'importo finale si sottrae l'eventuale tassazione sui guadagni.`,
   },
   {
     q: "Cosa cambia con inflazione e tassazione?",
-    a: "Se attivi «Tieni conto dell'inflazione», i valori sono espressi in termini reali (potere d'acquisto di oggi). La «Tassazione finale» applica l'aliquota indicata sui soli guadagni, così vedi il netto che ti resterebbe in tasca.",
+    a: "Se attivi «Tieni conto dell'inflazione», i valori vengono espressi in termini reali, cioè a parità di potere d'acquisto con oggi. La «Tassazione finale» applica l'aliquota selezionata (la percentuale di imposta) ai soli guadagni: il risultato mostra il valore al netto delle imposte.",
   },
   {
     q: "Il rendimento è realistico?",
@@ -71,9 +71,9 @@ export default function FaqPage() {
       </div>
 
       <div className="mt-10 rounded-card bg-accent px-6 py-8 text-accent-foreground">
-        <h2 className="text-lg font-semibold">Pronto a provare?</h2>
+        <h2 className="text-lg font-semibold">Inizia una simulazione</h2>
         <p className="mt-1 text-sm">
-          Bastano un importo e una data per vedere l&apos;effetto del tempo.
+          Bastano un importo e un periodo per vedere l&apos;effetto del tempo.
         </p>
         <Link
           href="/simulazione"
