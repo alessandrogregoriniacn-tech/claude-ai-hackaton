@@ -75,7 +75,10 @@ export default function Home() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
       <header className="mb-8">
-        <p className="text-sm font-medium text-primary">Hagenton</p>
+        <p className="inline-flex items-center gap-2 text-sm font-semibold">
+          <span className="inline-block h-3 w-3 rounded-full bg-accent" />
+          Hagenton
+        </p>
         <h1 className="mt-1 text-3xl font-bold tracking-tight">
           Quanto avresti risparmiato
         </h1>
@@ -97,7 +100,7 @@ export default function Home() {
               type="text"
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-primary"
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-foreground focus:border-primary"
             />
           </label>
 
@@ -109,7 +112,7 @@ export default function Home() {
               step={0.5}
               value={amount}
               onChange={(e) => setAmount(Math.max(0, Number(e.target.value)))}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-primary"
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-foreground focus:border-primary"
             />
           </label>
 
@@ -118,7 +121,7 @@ export default function Home() {
             <select
               value={frequency}
               onChange={(e) => setFrequency(e.target.value as Frequency)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-primary"
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-foreground focus:border-primary"
             >
               <option value="daily">Ogni giorno</option>
               <option value="weekly">Ogni settimana</option>
@@ -133,13 +136,13 @@ export default function Home() {
               value={startDate}
               max={new Date().toISOString().slice(0, 10)}
               onChange={(e) => setStartDate(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground outline-none focus:border-primary"
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-foreground focus:border-primary"
             />
           </label>
 
           <button
             onClick={handleSave}
-            className="mt-6 w-full rounded-lg bg-primary px-4 py-2.5 font-medium text-primary-foreground transition hover:opacity-90"
+            className="mt-6 w-full rounded-pill bg-primary px-4 py-3 font-semibold text-primary-foreground transition hover:opacity-90 active:opacity-80"
           >
             Salva scenario
           </button>
@@ -147,16 +150,22 @@ export default function Home() {
 
         {/* Risultati */}
         <section className="space-y-6">
-          <p className="text-sm text-muted">
-            Mettendo da parte {formatCurrency(amount, true)} {FREQUENCY_LABELS[frequency]} da{" "}
-            {new Date(`${startDate}T00:00:00`).toLocaleDateString("it-IT")} ({years} anni)…
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-md bg-accent px-5 py-4 text-accent-foreground">
+            <p className="text-sm font-medium">
+              {label.trim() || "Scenario"} · {formatCurrency(amount, true)}{" "}
+              {FREQUENCY_LABELS[frequency]} · da{" "}
+              {new Date(`${startDate}T00:00:00`).toLocaleDateString("it-IT")} ({years} anni)
+            </p>
+            <span className="rounded-md border border-foreground/30 px-3 py-1 text-xs font-semibold text-foreground">
+              +{formatPercent(ANNUAL_RETURN_RATE)} annuo
+            </span>
+          </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard
               label="Avresti oggi"
               value={formatCurrency(result.finalValue)}
-              tone="primary"
+              tone="gold"
             />
             <StatCard
               label="Totale versato"
@@ -165,7 +174,7 @@ export default function Home() {
             <StatCard
               label="Guadagno da rendimento"
               value={formatCurrency(result.interestEarned)}
-              tone="positive"
+              tone="gold"
               hint={`al ${formatPercent(ANNUAL_RETURN_RATE)} annuo`}
             />
           </div>
@@ -198,18 +207,18 @@ export default function Home() {
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="tabular-nums font-semibold text-primary">
+                    <span className="tabular-nums font-semibold text-foreground">
                       {formatCurrency(r.finalValue)}
                     </span>
                     <button
                       onClick={() => handleLoad(s)}
-                      className="text-sm text-muted underline-offset-2 hover:text-foreground hover:underline"
+                      className="-m-2 inline-flex min-h-11 items-center p-2 text-sm text-muted underline-offset-2 hover:text-foreground hover:underline"
                     >
                       Carica
                     </button>
                     <button
                       onClick={() => handleDelete(s.id)}
-                      className="text-sm text-negative underline-offset-2 hover:underline"
+                      className="-m-2 inline-flex min-h-11 items-center p-2 text-sm text-negative underline-offset-2 hover:underline"
                     >
                       Elimina
                     </button>

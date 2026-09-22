@@ -26,12 +26,16 @@ const config: Config = {
         accent: {
           DEFAULT: "var(--color-accent)",
           foreground: "var(--color-accent-foreground)",
+          strong: "var(--color-accent-strong)",
         },
         positive: "var(--color-positive)",
         negative: "var(--color-negative)",
       },
       borderRadius: {
         card: "var(--radius-card)",
+        md: "var(--radius-md)",
+        sm: "var(--radius-sm)",
+        pill: "var(--radius-pill)",
       },
       fontFamily: {
         sans: "var(--font-sans)",

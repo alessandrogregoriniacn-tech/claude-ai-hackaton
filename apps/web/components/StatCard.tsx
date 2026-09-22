@@ -2,16 +2,13 @@ interface StatCardProps {
   label: string;
   value: string;
   hint?: string;
-  tone?: "default" | "positive" | "primary";
+  tone?: "default" | "gold";
 }
 
 export function StatCard({ label, value, hint, tone = "default" }: StatCardProps) {
-  const valueColor =
-    tone === "positive"
-      ? "text-positive"
-      : tone === "primary"
-        ? "text-primary"
-        : "text-foreground";
+  // L'oro (accent-strong) è usato solo su valori grandi/bold: qui i valori sono
+  // testo grande, quindi il contrasto AA è rispettato.
+  const valueColor = tone === "gold" ? "text-accent-strong" : "text-foreground";
 
   return (
     <div className="rounded-card border border-border bg-surface p-5">
