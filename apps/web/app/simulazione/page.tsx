@@ -101,6 +101,29 @@ function SimulazioneContent() {
       setInstrument(scenario.instrument);
       setAdjustForInflation(scenario.adjustForInflation);
       setTaxRate(String(scenario.taxRate));
+
+      // Uno scenario aperto dallo storico è già completo: calcoliamo subito i
+      // risultati (box + grafico), senza attendere un click su «Calcola».
+      const scenarioInput: SimulationInput = {
+        initialCapital: scenario.initialCapital,
+        periodicAmount: scenario.periodicAmount,
+        periodicity: scenario.periodicity,
+        startDate: scenario.startDate,
+        endDate: scenario.endDate,
+        instrument: scenario.instrument,
+        adjustForInflation: scenario.adjustForInflation,
+        taxRate: scenario.taxRate,
+      };
+      const computed = simulate(scenarioInput);
+      setCommitted({
+        result: computed,
+        label: scenario.label.trim() || "Scenario",
+        instrumentLabel:
+          INSTRUMENT_OPTIONS.find((o) => o.value === scenario.instrument)
+            ?.label ?? "",
+        adjustForInflation: scenario.adjustForInflation,
+        years: (computed.months / 12).toFixed(1),
+      });
     }
   }, [loadId]);
   /* eslint-enable react-hooks/set-state-in-effect */
