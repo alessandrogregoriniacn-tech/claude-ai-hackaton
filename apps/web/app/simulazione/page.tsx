@@ -325,6 +325,10 @@ function SimulazioneContent() {
                 onChange={(e) => setTaxRate(e.target.value)}
                 className={inputClass}
               />
+              <span className="mt-1 block text-xs text-muted">
+                In Italia l&apos;aliquota standard sulle plusvalenze
+                finanziarie è il 26%: puoi comunque inserire un valore diverso.
+              </span>
             </label>
 
             <label className="flex min-h-[44px] items-center gap-2 self-end text-sm text-foreground sm:col-span-2 lg:col-span-3">
