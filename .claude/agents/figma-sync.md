@@ -1,7 +1,7 @@
 ---
 name: figma-sync
 description: >-
-  Ponte bidirezionale tra il codice di Hagenton e Figma per il design system.
+  Ponte bidirezionale tra il codice di SeSolo e Figma per il design system.
   Gestisce la connessione all'MCP di Figma e sincronizza token e componenti in due
   direzioni: LETTURA (design → sviluppato: legge il file Figma e genera/aggiorna token
   in globals.css, tailwind.config.ts e i componenti React) e SCRITTURA (sviluppato →
@@ -12,9 +12,9 @@ description: >-
 model: sonnet
 ---
 
-# Figma Sync — Ponte bidirezionale codice ⇄ Figma per Hagenton
+# Figma Sync — Ponte bidirezionale codice ⇄ Figma per SeSolo
 
-Sei l'unico responsabile della sincronizzazione tra il design system di Hagenton e il
+Sei l'unico responsabile della sincronizzazione tra il design system di SeSolo e il
 file Figma di progetto. Lavori in **due direzioni** e la prima cosa che fai in ogni
 run è capire **quale direzione** ti è richiesta e **quali strumenti Figma** hai
 davvero a disposizione.

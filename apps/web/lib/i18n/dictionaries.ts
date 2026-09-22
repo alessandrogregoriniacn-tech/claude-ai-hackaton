@@ -99,10 +99,10 @@ const it = {
     "12m": "ogni 12 mesi",
   } as Record<Periodicity, string>,
   home: {
-    eyebrow: "Hagenton",
+    eyebrow: "SeSolo",
     title: "Quanto avresti risparmiato?",
     intro:
-      "Hagenton è un simulatore retrospettivo: invece di promettere guadagni futuri, guarda al passato. Mostra quanto si sarebbe accumulato oggi se una piccola somma periodica — un abbonamento, un acquisto ricorrente — fosse stata messa da parte e investita in uno strumento a scelta.",
+      "SeSolo è un simulatore retrospettivo: invece di promettere guadagni futuri, guarda al passato. Mostra quanto si sarebbe accumulato oggi se una piccola somma periodica — un abbonamento, un acquisto ricorrente — fosse stata messa da parte e investita in uno strumento a scelta.",
     heroCta: "Prova una simulazione",
     sectionsTitle: "Le sezioni dell'app",
     sectionsSubtitle:
@@ -150,6 +150,7 @@ const it = {
       initialCapital: "Capitale iniziale (€)",
       periodicAmount: "Spesa periodica (€)",
       periodicity: "Periodicità",
+      periodicityHint: "(solo con spesa periodica)",
       startDate: "Periodo — dal",
       endDate: "Periodo — al",
       instrument: "Strumento",
@@ -158,6 +159,11 @@ const it = {
         "Aliquota standard in Italia: 26% (12,5% per titoli di Stato come BOT/BTP). Puoi comunque inserire un valore diverso.",
       inflation: "Tieni conto dell'inflazione",
       selectPlaceholder: "Seleziona…",
+    },
+    dateRangeErrors: {
+      invalid: "Data non valida: verifica che giorno, mese e anno siano completi.",
+      endBeforeStart: "La data «al» deve essere successiva alla data «dal».",
+      endAfterMax: "La data «al» non può superare ieri.",
     },
     buttons: {
       calculate: "Calcola simulazione",
@@ -256,18 +262,18 @@ const it = {
   faq: {
     title: "Domande frequenti",
     subtitle:
-      "Come funziona Hagenton, da dove vengono i dati storici usati per ogni strumento e cosa succede ai dati inseriti.",
+      "Come funziona SeSolo, da dove vengono i dati storici usati per ogni strumento e cosa succede ai dati inseriti.",
     groups: <FaqGroup[]>[
       {
         title: "In generale",
         items: [
           {
             id: "cosa-e-hagenton",
-            q: "Che cos'è Hagenton?",
+            q: "Che cos'è SeSolo?",
             a: "È un simulatore retrospettivo di risparmio. Prende un capitale iniziale e una spesa ricorrente e mostra quanto si sarebbe accumulato oggi se, invece di spenderli, fossero stati investiti nello strumento scelto.",
             keywords: [
-              "hagenton",
-              "cos'è hagenton",
+              "sesolo",
+              "cos'è sesolo",
               "a cosa serve l'app",
               "simulatore di risparmio",
               "come funziona l'app",
@@ -315,7 +321,7 @@ const it = {
           {
             id: "perche-retrospettivo",
             q: "Perché «retrospettivo» e non una proiezione futura?",
-            a: "Guardare al passato rende il costo delle piccole spese più concreto: «quanto si avrebbe già oggi» colpisce più di una promessa sul futuro. È un cambio di prospettiva, non uno strumento di investimento: Hagenton non indica cosa fare in futuro, né quale strumento scegliere.",
+            a: "Guardare al passato rende il costo delle piccole spese più concreto: «quanto si avrebbe già oggi» colpisce più di una promessa sul futuro. È un cambio di prospettiva, non uno strumento di investimento: SeSolo non indica cosa fare in futuro, né quale strumento scegliere.",
             keywords: [
               "retrospettivo",
               "perché guardare al passato",
@@ -395,7 +401,7 @@ const it = {
           {
             id: "periodo-dati-disponibili",
             q: "Che periodo coprono i dati storici?",
-            a: "Ogni strumento ha una copertura diversa, perché deriva da una fonte diversa: l'azionario globale parte dal 1985, titoli di Stato e bilanciato 60/40 dal 1928, Bitcoin dal 2010 e il proxy del libretto postale dal 1981. Se si sceglie una data di inizio o fine fuori da questo intervallo, Hagenton non inventa né estrapola un dato: la finestra viene automaticamente riportata (in gergo tecnico, «troncata») al periodo effettivamente disponibile per lo strumento scelto, e compare un avviso («Nota sui dati usati») che lo segnala in modo esplicito.",
+            a: "Ogni strumento ha una copertura diversa, perché deriva da una fonte diversa: l'azionario globale parte dal 1985, titoli di Stato e bilanciato 60/40 dal 1928, Bitcoin dal 2010 e il proxy del libretto postale dal 1981. Se si sceglie una data di inizio o fine fuori da questo intervallo, SeSolo non inventa né estrapola un dato: la finestra viene automaticamente riportata (in gergo tecnico, «troncata») al periodo effettivamente disponibile per lo strumento scelto, e compare un avviso («Nota sui dati usati») che lo segnala in modo esplicito.",
             keywords: [
               "copertura dati",
               "periodo storico",
@@ -427,7 +433,7 @@ const it = {
           {
             id: "dati-al-sicuro",
             q: "I miei dati sono al sicuro?",
-            a: "Sì: Hagenton non fa alcuna chiamata di rete verso l'esterno. Gli scenari salvati restano esclusivamente nella memoria locale del browser (localStorage) e non lasciano mai il dispositivo usato.",
+            a: "Sì: SeSolo non fa alcuna chiamata di rete verso l'esterno. Gli scenari salvati restano esclusivamente nella memoria locale del browser (localStorage) e non lasciano mai il dispositivo usato.",
             keywords: [
               "dati personali",
               "localStorage",
@@ -451,7 +457,7 @@ const it = {
           {
             id: "scenario-strumento-rimosso",
             q: "Cosa succede se riapro uno scenario che usa uno strumento non più disponibile?",
-            a: "Se in futuro un aggiornamento di Hagenton modifica gli strumenti disponibili, uno scenario salvato in precedenza continua ad aprirsi correttamente: Hagenton non genera un errore né una pagina vuota, ma segnala la situazione in modo esplicito e propone un'alternativa ragionevole, così da poter comunque consultare o correggere lo scenario.",
+            a: "Se in futuro un aggiornamento di SeSolo modifica gli strumenti disponibili, uno scenario salvato in precedenza continua ad aprirsi correttamente: SeSolo non genera un errore né una pagina vuota, ma segnala la situazione in modo esplicito e propone un'alternativa ragionevole, così da poter comunque consultare o correggere lo scenario.",
             keywords: [
               "strumento rimosso",
               "scenario non funziona più",
@@ -462,12 +468,12 @@ const it = {
         ],
       },
       {
-        title: "Cosa non è Hagenton",
+        title: "Cosa non è SeSolo",
         items: [
           {
             id: "consiglio-investimento",
-            q: "Hagenton mi dice cosa conviene fare?",
-            a: "No. Hagenton è uno strumento illustrativo che mostra, a partire da dati storici reali, quanto si sarebbe accumulato in un periodo passato con una determinata scelta. Non indica quale strumento scegliere, non consiglia di comprare o vendere nulla e non sostituisce una consulenza finanziaria personalizzata. Ogni risultato va letto come «ecco cosa sarebbe successo con questi dati storici», non come una previsione o un suggerimento su cosa fare.",
+            q: "SeSolo mi dice cosa conviene fare?",
+            a: "No. SeSolo è uno strumento illustrativo che mostra, a partire da dati storici reali, quanto si sarebbe accumulato in un periodo passato con una determinata scelta. Non indica quale strumento scegliere, non consiglia di comprare o vendere nulla e non sostituisce una consulenza finanziaria personalizzata. Ogni risultato va letto come «ecco cosa sarebbe successo con questi dati storici», non come una previsione o un suggerimento su cosa fare.",
             keywords: [
               "consiglio di investimento",
               "consulenza finanziaria",
@@ -511,12 +517,12 @@ const it = {
     fullscreenDialogAria: "Grafico della crescita a schermo intero",
     withReturn: "Con rendimento",
     onlyContributed: "Solo versato",
-    dragHint: "Trascina per scorrere · rotellina per zoomare",
+    dragHint: "Trascina per scorrere · pinch o Ctrl+rotellina per zoomare",
   },
   excel: {
     fileName: "hagenton-storico",
     sheetName: "Simulazioni",
-    title: "Hagenton — Storico simulazioni",
+    title: "SeSolo — Storico simulazioni",
     generatedAt: (date: string) => `Esportato il ${date}`,
     columns: {
       name: "Nome scenario",
@@ -635,10 +641,10 @@ const en: Dict = {
     "12m": "every 12 months",
   },
   home: {
-    eyebrow: "Hagenton",
+    eyebrow: "SeSolo",
     title: "How much would you have saved?",
     intro:
-      "Hagenton is a retrospective simulator: instead of promising future gains, it looks to the past. It shows how much you would have today if a small recurring amount — a subscription, a repeat purchase — had been set aside and invested in an instrument of your choice.",
+      "SeSolo is a retrospective simulator: instead of promising future gains, it looks to the past. It shows how much you would have today if a small recurring amount — a subscription, a repeat purchase — had been set aside and invested in an instrument of your choice.",
     heroCta: "Try a simulation",
     sectionsTitle: "The app sections",
     sectionsSubtitle:
@@ -686,6 +692,7 @@ const en: Dict = {
       initialCapital: "Initial capital (€)",
       periodicAmount: "Recurring expense (€)",
       periodicity: "Frequency",
+      periodicityHint: "(only with a recurring expense)",
       startDate: "Period — from",
       endDate: "Period — to",
       instrument: "Instrument",
@@ -694,6 +701,11 @@ const en: Dict = {
         "Standard rate in Italy: 26% (12.5% for government securities such as BOT/BTP). You can still enter a different value.",
       inflation: "Account for inflation",
       selectPlaceholder: "Select…",
+    },
+    dateRangeErrors: {
+      invalid: "Invalid date: check that day, month and year are complete.",
+      endBeforeStart: "The «to» date must be later than the «from» date.",
+      endAfterMax: "The «to» date can't be later than yesterday.",
     },
     buttons: {
       calculate: "Run simulation",
@@ -791,18 +803,18 @@ const en: Dict = {
   faq: {
     title: "Frequently asked questions",
     subtitle:
-      "How Hagenton works, where the historical data used for each instrument comes from, and what happens to the data you enter.",
+      "How SeSolo works, where the historical data used for each instrument comes from, and what happens to the data you enter.",
     groups: [
       {
         title: "General",
         items: [
           {
             id: "cosa-e-hagenton",
-            q: "What is Hagenton?",
+            q: "What is SeSolo?",
             a: "It's a retrospective savings simulator. It takes an initial capital and a recurring expense and shows how much would have been accumulated today if, instead of being spent, it had been invested in the chosen instrument.",
             keywords: [
-              "hagenton",
-              "what is hagenton",
+              "sesolo",
+              "what is sesolo",
               "what is this app for",
               "savings simulator",
               "how the app works",
@@ -850,7 +862,7 @@ const en: Dict = {
           {
             id: "perche-retrospettivo",
             q: "Why “retrospective” and not a future projection?",
-            a: "Looking to the past makes the cost of small expenses more concrete: “how much I'd already have today” hits harder than a promise about the future. It's a change of perspective, not an investment tool: Hagenton does not indicate what to do in future, nor which instrument to choose.",
+            a: "Looking to the past makes the cost of small expenses more concrete: “how much I'd already have today” hits harder than a promise about the future. It's a change of perspective, not an investment tool: SeSolo does not indicate what to do in future, nor which instrument to choose.",
             keywords: [
               "retrospective",
               "why look at the past",
@@ -929,7 +941,7 @@ const en: Dict = {
           {
             id: "periodo-dati-disponibili",
             q: "What period does the historical data cover?",
-            a: "Each instrument has different coverage, because it comes from a different source: global equity starts in 1985, government bonds and the balanced 60/40 mix in 1928, Bitcoin in 2010, and the postal savings proxy in 1981. If you choose a start or end date outside this range, Hagenton does not invent or extrapolate a figure: the window is automatically brought back (in technical terms, “clamped”) to the period actually available for the chosen instrument, and a notice (“Note on the data used”) appears to flag this explicitly.",
+            a: "Each instrument has different coverage, because it comes from a different source: global equity starts in 1985, government bonds and the balanced 60/40 mix in 1928, Bitcoin in 2010, and the postal savings proxy in 1981. If you choose a start or end date outside this range, SeSolo does not invent or extrapolate a figure: the window is automatically brought back (in technical terms, “clamped”) to the period actually available for the chosen instrument, and a notice (“Note on the data used”) appears to flag this explicitly.",
             keywords: [
               "data coverage",
               "historical period",
@@ -961,7 +973,7 @@ const en: Dict = {
           {
             id: "dati-al-sicuro",
             q: "Is my data safe?",
-            a: "Yes: Hagenton makes no network calls of any kind. Saved scenarios stay exclusively in the browser's local storage (localStorage) and never leave the device used.",
+            a: "Yes: SeSolo makes no network calls of any kind. Saved scenarios stay exclusively in the browser's local storage (localStorage) and never leave the device used.",
             keywords: [
               "personal data",
               "localStorage",
@@ -985,7 +997,7 @@ const en: Dict = {
           {
             id: "scenario-strumento-rimosso",
             q: "What happens if I reopen a scenario that uses an instrument no longer available?",
-            a: "If a future Hagenton update changes the available instruments, a previously saved scenario still opens correctly: Hagenton does not throw an error or show a blank page, but flags the situation explicitly and proposes a reasonable alternative, so the scenario can still be viewed or corrected.",
+            a: "If a future SeSolo update changes the available instruments, a previously saved scenario still opens correctly: SeSolo does not throw an error or show a blank page, but flags the situation explicitly and proposes a reasonable alternative, so the scenario can still be viewed or corrected.",
             keywords: [
               "instrument removed",
               "scenario no longer works",
@@ -996,12 +1008,12 @@ const en: Dict = {
         ],
       },
       {
-        title: "What Hagenton is not",
+        title: "What SeSolo is not",
         items: [
           {
             id: "consiglio-investimento",
-            q: "Does Hagenton tell me what I should do?",
-            a: "No. Hagenton is an illustrative tool that shows, based on real historical data, how much would have been accumulated over a past period with a given choice. It does not indicate which instrument to choose, does not recommend buying or selling anything, and does not replace personalised financial advice. Every result should be read as “here is what would have happened with this historical data”, not as a forecast or a suggestion about what to do.",
+            q: "Does SeSolo tell me what I should do?",
+            a: "No. SeSolo is an illustrative tool that shows, based on real historical data, how much would have been accumulated over a past period with a given choice. It does not indicate which instrument to choose, does not recommend buying or selling anything, and does not replace personalised financial advice. Every result should be read as “here is what would have happened with this historical data”, not as a forecast or a suggestion about what to do.",
             keywords: [
               "investment advice",
               "financial advice",
@@ -1044,12 +1056,12 @@ const en: Dict = {
     fullscreenDialogAria: "Fullscreen growth chart",
     withReturn: "With return",
     onlyContributed: "Contributed only",
-    dragHint: "Drag to scroll · scroll wheel to zoom",
+    dragHint: "Drag to scroll · pinch or Ctrl+scroll to zoom",
   },
   excel: {
     fileName: "hagenton-history",
     sheetName: "Simulations",
-    title: "Hagenton — Simulation history",
+    title: "SeSolo — Simulation history",
     generatedAt: (date: string) => `Exported on ${date}`,
     columns: {
       name: "Scenario name",

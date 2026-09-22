@@ -1,7 +1,7 @@
 ---
 name: test-coverage
 description: >-
-  Esegue gli unit test dell'app web di Hagenton (apps/web) con Vitest e genera un
+  Esegue gli unit test dell'app web di SeSolo (apps/web) con Vitest e genera un
   report di code coverage in reports/coverage/. Configura Vitest e le dipendenze
   di coverage se non sono ancora presenti. Da usare quando l'utente vuole lanciare
   i test o misurare la copertura. Esempi di trigger: "fai gli unit test", "lancia
@@ -9,7 +9,7 @@ description: >-
   codice", "controlla la copertura dei test".
 ---
 
-# Unit test + code coverage — Hagenton
+# Unit test + code coverage — SeSolo
 
 Esegue la suite di unit test di `apps/web` con **Vitest** e produce un **report di
 code coverage** in `reports/coverage/`. Tutto client-side, nessuna rete: coerente

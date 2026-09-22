@@ -1,7 +1,7 @@
 # Agents
 
 Questa cartella raccoglie gli **agenti e i subagent** usati durante lo sviluppo del
-progetto Hagenton: definizioni, prompt, configurazioni e note operative.
+progetto SeSolo: definizioni, prompt, configurazioni e note operative.
 
 ## Organizzazione
 

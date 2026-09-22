@@ -1,6 +1,6 @@
 # Figma Sync
 
-Agente **ponte bidirezionale** tra il codice del design system di Hagenton e il file
+Agente **ponte bidirezionale** tra il codice del design system di SeSolo e il file
 Figma di progetto.
 
 ## Ruolo

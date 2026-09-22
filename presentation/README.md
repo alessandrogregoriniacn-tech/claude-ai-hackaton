@@ -1,6 +1,6 @@
 # Presentation
 
-Questa cartella contiene il materiale per **presentare e spiegare il progetto Hagenton**:
+Questa cartella contiene il materiale per **presentare e spiegare il progetto SeSolo**:
 slide, note, diagrammi, demo, screenshot.
 
 ## Contenuti previsti

@@ -35,7 +35,7 @@ export async function exportScenariosToExcel(
 ): Promise<void> {
   const { Workbook } = await import("exceljs");
   const workbook = new Workbook();
-  workbook.creator = "Hagenton";
+  workbook.creator = "SeSolo";
   workbook.created = new Date();
 
   const sheet = workbook.addWorksheet(t.excel.sheetName, {

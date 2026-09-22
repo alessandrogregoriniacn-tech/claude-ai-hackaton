@@ -1,4 +1,4 @@
-# Hagenton
+# SeSolo
 
 **Simulatore retrospettivo di risparmio** — invece di proiettare i guadagni futuri,
 mostra *quanto avresti accumulato oggi* se in passato avessi messo da parte una
@@ -7,7 +7,7 @@ spesa ricorrente, applicando un rendimento annuo fisso (default **10%**).
 ## Struttura della repo
 
 ```
-Hagenton/
+SeSolo/
 ├── README.md          # questo file
 ├── apps/              # le applicazioni del progetto
 │   └── web/           # la web app Next.js (App Router)

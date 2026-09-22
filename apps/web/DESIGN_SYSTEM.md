@@ -1,4 +1,4 @@
-# Hagenton — Design System (v1)
+# SeSolo — Design System (v1)
 
 Ispirato alla palette **"FastPay"**: fintech chiaro e caldo, costruito su
 **crema + bianco + nero + giallo oro**. Direzione scelta: **"Nero azione, giallo

@@ -40,7 +40,7 @@ export function Nav() {
             aria-hidden="true"
             className="inline-block h-3 w-3 rounded-pill bg-accent"
           />
-          Hagenton
+          SeSolo
         </Link>
 
         {/* Link desktop */}

@@ -28,6 +28,9 @@ const PERIODICITY_VALUES: Periodicity[] = ["1w", "2w", "1m", "3m", "6m", "12m"];
 /** Trattino usato quando un valore non è ancora calcolabile. */
 const DASH = "—";
 
+/** Cadenza usata quando la spesa periodica è 0: non incide sul calcolo. */
+const FALLBACK_PERIODICITY: Periodicity = "1m";
+
 /** Data di ieri in formato ISO: è l'ultima data selezionabile (niente oggi/futuro). */
 function yesterdayISO(): string {
   const d = new Date();
@@ -141,23 +144,36 @@ function SimulazioneContent() {
   const amountNum = parseNumber(periodicAmount);
   const taxNum = parseNumber(taxRate);
 
-  // Input valido = finestra temporale coerente (fine > inizio, non oltre ieri),
-  // strumento e periodicità scelti, almeno un importo positivo.
-  const input = useMemo<SimulationInput | null>(() => {
-    if (!periodicity || !instrument || !startDate || !endDate) return null;
+  // Messaggio inline sulla finestra temporale: senza questo, una data
+  // incompleta (es. anno a 2 cifre nel picker nativo) o fuori range lascia i
+  // pulsanti disabilitati senza che l'utente capisca perché.
+  const dateRangeError = useMemo(() => {
+    if (!startDate || !endDate) return null;
     const start = new Date(startDate);
     const end = new Date(endDate);
-    if (end <= start) return null;
-    if (end > new Date(maxDate)) return null;
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      return t.sim.dateRangeErrors.invalid;
+    }
+    if (end <= start) return t.sim.dateRangeErrors.endBeforeStart;
+    if (end > new Date(maxDate)) return t.sim.dateRangeErrors.endAfterMax;
+    return null;
+  }, [startDate, endDate, maxDate, t]);
+
+  // Input valido = finestra temporale coerente (fine > inizio, non oltre ieri),
+  // strumento scelto, almeno un importo positivo. La periodicità serve solo se
+  // c'è una spesa periodica: senza di essa non incide sul calcolo.
+  const input = useMemo<SimulationInput | null>(() => {
+    if (!instrument || !startDate || !endDate || dateRangeError) return null;
 
     const capital = capitalNum ?? 0;
     const amount = amountNum ?? 0;
     if (capital <= 0 && amount <= 0) return null;
+    if (amount > 0 && !periodicity) return null;
 
     return {
       initialCapital: capital,
       periodicAmount: amount,
-      periodicity,
+      periodicity: periodicity || FALLBACK_PERIODICITY,
       startDate,
       endDate,
       instrument,
@@ -170,10 +186,10 @@ function SimulazioneContent() {
     periodicity,
     startDate,
     endDate,
+    dateRangeError,
     instrument,
     adjustForInflation,
     taxNum,
-    maxDate,
   ]);
 
   const canSimulate = input !== null;
@@ -303,6 +319,7 @@ function SimulazioneContent() {
 
             <label className="block text-sm text-muted">
               {t.sim.fields.periodicity}
+              <span className="ml-1 text-xs">{t.sim.fields.periodicityHint}</span>
               <select
                 value={periodicity}
                 onChange={(e) => setPeriodicity(e.target.value as Periodicity)}
@@ -341,6 +358,15 @@ function SimulazioneContent() {
                 className={inputClass}
               />
             </label>
+
+            {dateRangeError ? (
+              <p
+                role="status"
+                className="sm:col-span-2 lg:col-span-3 -mt-2 text-xs text-negative"
+              >
+                {dateRangeError}
+              </p>
+            ) : null}
 
             <div className="block text-sm text-muted">
               <div className="flex items-center gap-2">

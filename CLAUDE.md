@@ -4,7 +4,7 @@ Guidance for Claude Code in this repo.
 
 ## Project
 
-**Hagenton** — simulatore retrospettivo di risparmio/investimento per l'Hagenthon
+**SeSolo** — simulatore retrospettivo di risparmio/investimento per l'Hagenthon
 (Accenture), tema **02 · Inclusione Finanziaria**. Mostra quanto si sarebbe
 accumulato investendo in passato in uno strumento a scelta (azionario,
 obbligazionario, bitcoin, libretto postale, conto fermo), con inflazione e

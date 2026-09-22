@@ -34,7 +34,7 @@ const IT_GROUPS: FaqGroup[] = [
       {
         id: "dati-al-sicuro",
         q: "I miei dati sono al sicuro?",
-        a: "Hagenton non fa alcuna chiamata di rete verso l'esterno.",
+        a: "SeSolo non fa alcuna chiamata di rete verso l'esterno.",
         keywords: ["dati personali", "localStorage", "sicurezza", "privacy"],
       },
     ],
@@ -73,7 +73,7 @@ const EN_GROUPS: FaqGroup[] = [
       {
         id: "dati-al-sicuro",
         q: "Is my data safe?",
-        a: "Hagenton makes no network calls of any kind.",
+        a: "SeSolo makes no network calls of any kind.",
         keywords: ["personal data", "localStorage", "security", "privacy"],
       },
     ],
