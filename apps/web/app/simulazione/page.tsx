@@ -344,11 +344,8 @@ function SimulazioneContent() {
                 className={inputClass}
               />
               <span className="mt-1 block text-xs text-muted">
-                In Italia l&apos;aliquota standard sulle plusvalenze
-                finanziarie è il 26%: puoi comunque inserire un valore diverso.
-                I titoli di Stato italiani ed equiparati (es. BOT, BTP)
-                godono di un&apos;aliquota agevolata del 12,5%, anziché il
-                26% ordinario applicato agli altri strumenti finanziari.
+                Aliquota standard in Italia: 26% (12,5% per titoli di Stato
+                come BOT/BTP). Puoi comunque inserire un valore diverso.
               </span>
             </label>
 
