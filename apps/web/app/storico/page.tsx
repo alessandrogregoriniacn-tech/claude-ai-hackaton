@@ -66,7 +66,7 @@ export default function StoricoPage() {
         {scenarios.length > 0 ? (
           <button
             onClick={handleClear}
-            className="min-h-11 rounded-pill border border-border px-4 text-sm font-medium text-muted transition hover:border-negative hover:text-negative"
+            className="min-h-11 rounded-pill border-2 border-negative px-4 text-sm font-semibold text-negative transition hover:bg-negative/10 active:opacity-80"
           >
             Svuota storico
           </button>
@@ -133,13 +133,13 @@ export default function StoricoPage() {
                     </span>
                     <Link
                       href={`/simulazione?load=${s.id}`}
-                      className="-m-2 inline-flex min-h-11 items-center p-2 text-sm text-muted underline-offset-2 hover:text-foreground hover:underline"
+                      className="inline-flex min-h-11 items-center rounded-pill border-2 border-foreground px-4 text-sm font-semibold text-foreground transition hover:bg-foreground/10 active:opacity-80"
                     >
                       Apri
                     </Link>
                     <button
                       onClick={() => handleDelete(s.id)}
-                      className="-m-2 inline-flex min-h-11 items-center p-2 text-sm text-negative underline-offset-2 hover:underline"
+                      className="-m-2 inline-flex min-h-11 items-center p-2 text-sm font-medium text-negative underline-offset-2 hover:underline"
                     >
                       Elimina
                     </button>
