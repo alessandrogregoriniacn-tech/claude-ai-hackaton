@@ -9,6 +9,7 @@ import {
   type Periodicity,
   type SimulationInput,
 } from "@/lib/finance";
+import { INSTRUMENT_KEYS, INSTRUMENT_LABELS } from "@/lib/constants";
 import { formatCurrency } from "@/lib/format";
 import {
   createId,
@@ -18,6 +19,8 @@ import {
 } from "@/lib/storage";
 import { StatCard } from "@/components/StatCard";
 import { GrowthChart } from "@/components/GrowthChart";
+import { WarningBanner } from "@/components/WarningBanner";
+import { InstrumentInfoPopover } from "@/components/InstrumentInfoPopover";
 
 const PERIODICITY_OPTIONS: { value: Periodicity; label: string }[] = [
   { value: "1w", label: "1 settimana" },
@@ -28,11 +31,9 @@ const PERIODICITY_OPTIONS: { value: Periodicity; label: string }[] = [
   { value: "12m", label: "12 mesi" },
 ];
 
-const INSTRUMENT_OPTIONS: { value: Instrument; label: string }[] = [
-  { value: "azionaria", label: "Azionaria" },
-  { value: "obbligazionaria", label: "Obbligazionaria" },
-  { value: "bitcoin", label: "Bitcoin" },
-];
+/** Fonte di verità unica per chiavi/etichette: `lib/constants.ts`. */
+const INSTRUMENT_OPTIONS: { value: Instrument; label: string }[] =
+  INSTRUMENT_KEYS.map((key) => ({ value: key, label: INSTRUMENT_LABELS[key] }));
 
 /** Trattino usato quando un valore non è ancora calcolabile. */
 const DASH = "—";
@@ -284,9 +285,19 @@ function SimulazioneContent() {
               />
             </label>
 
-            <label className="block text-sm text-muted">
-              Strumento
+            <div className="block text-sm text-muted">
+              <div className="flex items-center gap-2">
+                <label htmlFor="instrument-select">Strumento</label>
+                <InstrumentInfoPopover
+                  instrument={instrument}
+                  instrumentLabel={
+                    INSTRUMENT_OPTIONS.find((o) => o.value === instrument)
+                      ?.label ?? ""
+                  }
+                />
+              </div>
               <select
+                id="instrument-select"
                 value={instrument}
                 onChange={(e) => setInstrument(e.target.value as Instrument)}
                 className={inputClass}
@@ -300,7 +311,7 @@ function SimulazioneContent() {
                   </option>
                 ))}
               </select>
-            </label>
+            </div>
 
             <label className="block text-sm text-muted">
               Tassazione finale (%)
@@ -367,6 +378,10 @@ function SimulazioneContent() {
           )}
         </section>
 
+        {result && result.warnings.length > 0 ? (
+          <WarningBanner warnings={result.warnings} />
+        ) : null}
+
         {/* 3. I tre box del risultato */}
         <div className="grid gap-4 sm:grid-cols-3">
           <StatCard
@@ -395,10 +410,10 @@ function SimulazioneContent() {
       </div>
 
       <footer className="mt-12 border-t border-border pt-6 text-xs text-muted">
-        Simulazione a scopo illustrativo. I rendimenti degli strumenti sono
-        ipotesi fisse con capitalizzazione mensile e non costituiscono un
-        consiglio di investimento. Nessun dato lascia il tuo browser: gli scenari
-        sono salvati in locale.
+        Simulazione a scopo illustrativo, calcolata sull&apos;andamento storico
+        reale dello strumento scelto: non costituisce un consiglio di
+        investimento. Nessun dato lascia il tuo browser: gli scenari sono
+        salvati in locale.
       </footer>
     </main>
   );
